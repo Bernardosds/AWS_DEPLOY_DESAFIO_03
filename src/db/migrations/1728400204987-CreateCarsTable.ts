@@ -61,12 +61,14 @@ export class CreateCarsTable1728400204987 implements MigrationInterface {
           {
             name: 'registration_date',
             type: 'datetime',
+            default: 'CURRENT_TIMESTAMP',
             isNullable: false,
           },
           {
             name: 'updated_time',
             type: 'datetime',
-            default: 'CURRENT_TIMESTAMP',
+            isNullable: true,
+            onUpdate: 'CURRENT_TIMESTAMP',
           },
         ],
       }),
