@@ -1,8 +1,4 @@
-enum CarStatus {
-  Active = 'active',
-  Inactive = 'inactive',
-  Deleted = 'deleted',
-}
+import CarStatus from './CarStatus';
 
 interface ICars {
   id?: string;
