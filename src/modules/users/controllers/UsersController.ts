@@ -3,17 +3,22 @@ import ICreateUserService from '../models/ICreateUserServices';
 import IListUsersService from '../models/IListUsersService';
 import IPagedList from '../models/IPagedList';
 import IUser from '../models/IUser';
+import IShowUserService from '../models/IShowUserService';
 
 export default class UsersController {
   private createUserService: ICreateUserService;
   private listUsersService: IListUsersService;
+  private showUserService: IShowUserService;
+
 
   constructor(
     createUserService: ICreateUserService,
     listUsersService: IListUsersService,
+    showUserService: IShowUserService,
   ) {
     this.createUserService = createUserService;
     this.listUsersService = listUsersService;
+    this.showUserService = showUserService;
   }
 
   async create(req: Request, res: Response): Promise<void> {
@@ -24,7 +29,7 @@ export default class UsersController {
     res.status(201).json({ id });
   }
 
-  async findAll(req: Request, res: Response): Promise<void> {
+  async listUsers(req: Request, res: Response): Promise<void> {
     let filters = {};
 
     let sort = {
@@ -56,5 +61,13 @@ export default class UsersController {
     });
 
     res.status(200).json(users);
+  }
+
+  async show(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
+
+    const user = await this.showUserService.execute(id);
+
+    res.status(200).json({user});
   }
 }

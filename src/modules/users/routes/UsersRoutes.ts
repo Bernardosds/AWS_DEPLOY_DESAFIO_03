@@ -7,6 +7,7 @@ import User from '../entities/User';
 import { celebrate, Joi, Segments } from 'celebrate';
 import { AppDataSource } from '../../../db/DataSource';
 import ListUsersService from '../services/ListUsersService';
+import ShowUserService from '../services/ShowUserService';
 
 const userRouter = Router();
 
@@ -19,10 +20,12 @@ const hashProvider = new HashProvider();
 
 const createUserService = new CreateUserService(usersRepository, hashProvider);
 const listUsersService = new ListUsersService(usersRepository);
+const showUserService = new ShowUserService(usersRepository);
 
 const usersController = new UsersController(
   createUserService,
   listUsersService,
+  showUserService,
 );
 
 userRouter.get(
@@ -40,7 +43,17 @@ userRouter.get(
       }),
     },
   }),
-  (req, res) => usersController.findAll(req, res)
+  (req, res) => usersController.listUsers(req, res)
+);
+
+userRouter.get(
+  '/:id',
+  celebrate({
+    [Segments.PARAMS]: {
+      id: Joi.string().uuid().required(),
+    }
+  }), 
+  (req, res) => usersController.show(req, res)
 );
 
 userRouter.post(
