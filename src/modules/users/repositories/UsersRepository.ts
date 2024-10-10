@@ -1,7 +1,8 @@
-import { Repository } from "typeorm";
-import User from "../entities/User";
-import IUsersRepository from "../models/IUsersRepository";
-import IUser from "../models/IUser";
+import { Repository, Like, Not, IsNull } from 'typeorm';
+import User from '../entities/User';
+import IUsersRepository from '../models/IUsersRepository';
+import IFindUsersOptions from '../models/IFindUsersOptions';
+import IUser from '../models/IUser';
 
 export default class UsersRepository implements IUsersRepository {
   private usersRepository: Repository<User>;
@@ -19,7 +20,7 @@ export default class UsersRepository implements IUsersRepository {
 
   public async findByEmail(email: string): Promise<IUser | null> {
     const user = await this.usersRepository.findOne({
-        where: { email },
+      where: { email },
     });
 
     return user;
@@ -41,8 +42,23 @@ export default class UsersRepository implements IUsersRepository {
     return user || null;
   }
 
-  public async findAll(): Promise<IUser[]> {
-    return await this.usersRepository.find();
+  public async findAll(options: IFindUsersOptions): Promise<[IUser[], number]> {
+    const { filters, sort, pagination } = options;
+
+    const [users, count] = await this.usersRepository.findAndCount({
+      where: {
+        name: filters.name ? Like(`%${filters.name}%`) : undefined,
+        email: filters.email ? Like(`%${filters.email}%`) : undefined,
+        deletedAt: filters.isDeleted ? Not(IsNull()) : IsNull(),
+      },
+      order: {
+        [sort.field]: sort.order,
+      },
+      skip: (pagination.page - 1) * pagination.size,
+      take: pagination.size,
+    });
+
+    return [users, count];
   }
 
   public async update(id: string, user: Partial<IUser>): Promise<IUser | null> {
