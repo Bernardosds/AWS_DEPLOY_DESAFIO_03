@@ -12,4 +12,6 @@ customerRouter.post(
   customerController.create,
 );
 
+customerRouter.get('/customers/:id', customerController.read);
+
 export default customerRouter;
