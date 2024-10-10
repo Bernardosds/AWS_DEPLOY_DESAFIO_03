@@ -4,21 +4,24 @@ import IListUsersService from '../models/IListUsersService';
 import IPagedList from '../models/IPagedList';
 import IUser from '../models/IUser';
 import IShowUserService from '../models/IShowUserService';
+import IDeleteUserService from '../models/IDeleteUserService';
 
 export default class UsersController {
   private createUserService: ICreateUserService;
   private listUsersService: IListUsersService;
   private showUserService: IShowUserService;
-
+  private deleteUserService: IDeleteUserService;
 
   constructor(
     createUserService: ICreateUserService,
     listUsersService: IListUsersService,
     showUserService: IShowUserService,
+    deleteUserService: IDeleteUserService,
   ) {
     this.createUserService = createUserService;
     this.listUsersService = listUsersService;
     this.showUserService = showUserService;
+    this.deleteUserService = deleteUserService;
   }
 
   async create(req: Request, res: Response): Promise<void> {
@@ -33,8 +36,8 @@ export default class UsersController {
     let filters = {};
 
     let sort = {
-      field: 'createdAt' as keyof IUser, 
-      order: 'ASC' as 'ASC' | 'DESC', 
+      field: 'createdAt' as keyof IUser,
+      order: 'ASC' as 'ASC' | 'DESC',
     };
 
     let pagination = {
@@ -43,15 +46,15 @@ export default class UsersController {
     };
 
     if (req.query.filters) {
-        filters = JSON.parse(req.query.filters as string);
+      filters = JSON.parse(req.query.filters as string);
     }
 
     if (req.query.sort) {
-        sort = JSON.parse(req.query.sort as string);
+      sort = JSON.parse(req.query.sort as string);
     }
 
     if (req.query.pagination) {
-        pagination = JSON.parse(req.query.pagination as string);
+      pagination = JSON.parse(req.query.pagination as string);
     }
 
     const users: IPagedList<IUser> = await this.listUsersService.execute({
@@ -68,6 +71,14 @@ export default class UsersController {
 
     const user = await this.showUserService.execute(id);
 
-    res.status(200).json({user});
+    res.status(200).json({ user });
+  }
+
+  async remove(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
+
+    await this.deleteUserService.execute(id);
+
+    res.status(200).json({});
   }
 }

@@ -8,6 +8,7 @@ import { celebrate, Joi, Segments } from 'celebrate';
 import { AppDataSource } from '../../../db/DataSource';
 import ListUsersService from '../services/ListUsersService';
 import ShowUserService from '../services/ShowUserService';
+import DeleteUserService from '../services/DeleteUserService';
 
 const userRouter = Router();
 
@@ -21,11 +22,13 @@ const hashProvider = new HashProvider();
 const createUserService = new CreateUserService(usersRepository, hashProvider);
 const listUsersService = new ListUsersService(usersRepository);
 const showUserService = new ShowUserService(usersRepository);
+const deleteUserService = new DeleteUserService(usersRepository);
 
 const usersController = new UsersController(
   createUserService,
   listUsersService,
   showUserService,
+  deleteUserService,
 );
 
 userRouter.get(
@@ -43,7 +46,7 @@ userRouter.get(
       }),
     },
   }),
-  (req, res) => usersController.listUsers(req, res)
+  (req, res) => usersController.listUsers(req, res),
 );
 
 userRouter.get(
@@ -51,9 +54,9 @@ userRouter.get(
   celebrate({
     [Segments.PARAMS]: {
       id: Joi.string().uuid().required(),
-    }
-  }), 
-  (req, res) => usersController.show(req, res)
+    },
+  }),
+  (req, res) => usersController.show(req, res),
 );
 
 userRouter.post(
@@ -67,8 +70,17 @@ userRouter.post(
   }),
   (req, res) => usersController.create(req, res),
 );
-// userRouter.get('id', controller);
+
 // userRouter.put('id', controller);
-// userRouter.delete('id', controller);
+
+userRouter.delete(
+  '/:id',
+  celebrate({
+    [Segments.PARAMS]: {
+      id: Joi.string().uuid().required(),
+    },
+  }),
+  (req, res) => usersController.remove(req, res),
+);
 
 export default userRouter;
