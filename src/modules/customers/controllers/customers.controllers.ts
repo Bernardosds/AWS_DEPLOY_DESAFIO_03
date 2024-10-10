@@ -39,5 +39,33 @@ class CustomerController {
       return;
     }
   }
+
+  async delete(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
+    const customer = await customerRepositorySource.findOne({
+      where: { id },
+      withDeleted: true,
+    });
+    await customerRepositorySource.softDelete({ id });
+
+    if (!id || !isUuid(id)) {
+      res.status(400).json({ message: 'Valid ID is required' });
+      return;
+    }
+
+    if (!customer) {
+      res.status(404).json({ message: 'Customer not found' });
+      return;
+    }
+
+    if (customer.deletedAt) {
+      res.status(400).json({ message: 'Customer already deleted' });
+      return;
+    }
+
+    res.status(200).json({ message: 'Customer deleted' });
+    return;
+  }
 }
+
 export default CustomerController;

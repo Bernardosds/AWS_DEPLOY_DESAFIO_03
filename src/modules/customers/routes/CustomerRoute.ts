@@ -14,4 +14,6 @@ customerRouter.post(
 
 customerRouter.get('/customers/:id', customerController.read);
 
+customerRouter.delete('/customers/:id', customerController.delete);
+
 export default customerRouter;
