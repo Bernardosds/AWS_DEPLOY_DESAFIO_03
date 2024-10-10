@@ -11,6 +11,10 @@ export default class UsersRepository implements IUsersRepository {
     this.usersRepository = usersRepository;
   }
 
+  public async save(user: User): Promise<User> {
+    return this.usersRepository.save(user);
+  }
+
   public async create(user: IUser): Promise<string> {
     const newUser = await this.usersRepository.create(user);
     await this.usersRepository.save(newUser);

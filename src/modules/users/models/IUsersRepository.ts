@@ -2,6 +2,7 @@ import IUser from './IUser';
 import IFindUsersOptions from './IFindUsersOptions';
 
 export default interface IUsersRepository {
+  save(user: IUser): Promise<IUser>;
   create(user: IUser): Promise<string>;
   findByEmail(email: string): Promise<IUser | null>;
   findById(id: string): Promise<IUser | null>;
