@@ -9,6 +9,7 @@ import { AppDataSource } from '../../../db/DataSource';
 import ListUsersService from '../services/ListUsersService';
 import ShowUserService from '../services/ShowUserService';
 import DeleteUserService from '../services/DeleteUserService';
+import UpdateUserService from '../services/UpdateUserService';
 
 const userRouter = Router();
 
@@ -23,12 +24,14 @@ const createUserService = new CreateUserService(usersRepository, hashProvider);
 const listUsersService = new ListUsersService(usersRepository);
 const showUserService = new ShowUserService(usersRepository);
 const deleteUserService = new DeleteUserService(usersRepository);
+const updateUserService = new UpdateUserService(usersRepository, hashProvider);
 
 const usersController = new UsersController(
   createUserService,
   listUsersService,
   showUserService,
   deleteUserService,
+  updateUserService
 );
 
 userRouter.get(
@@ -71,7 +74,20 @@ userRouter.post(
   (req, res) => usersController.create(req, res),
 );
 
-// userRouter.put('id', controller);
+userRouter.patch(
+  '/:id',
+  celebrate({
+    [Segments.PARAMS]: {
+      id: Joi.string().uuid().required(),
+    },
+    [Segments.BODY]: {
+      name: Joi.string().optional(),
+      email: Joi.string().email().optional(),
+      password: Joi.string().min(8).optional(),
+    },
+  }),
+  (req, res) => usersController.update(req, res),
+);
 
 userRouter.delete(
   '/:id',

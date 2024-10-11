@@ -5,23 +5,27 @@ import IPagedList from '../models/IPagedList';
 import IUser from '../models/IUser';
 import IShowUserService from '../models/IShowUserService';
 import IDeleteUserService from '../models/IDeleteUserService';
+import IUpdateUserService from '../models/IUpdateUserService';
 
 export default class UsersController {
   private createUserService: ICreateUserService;
   private listUsersService: IListUsersService;
   private showUserService: IShowUserService;
   private deleteUserService: IDeleteUserService;
+  private updateUserService: IUpdateUserService;
 
   constructor(
     createUserService: ICreateUserService,
     listUsersService: IListUsersService,
     showUserService: IShowUserService,
     deleteUserService: IDeleteUserService,
+    updateUserService: IUpdateUserService,
   ) {
     this.createUserService = createUserService;
     this.listUsersService = listUsersService;
     this.showUserService = showUserService;
     this.deleteUserService = deleteUserService;
+    this.updateUserService = updateUserService;
   }
 
   async create(req: Request, res: Response): Promise<void> {
@@ -80,5 +84,19 @@ export default class UsersController {
     await this.deleteUserService.execute(id);
 
     res.status(200).json({});
+  }
+
+  async update(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
+    const { name, email, password } = req.body;
+
+    const user = await this.updateUserService.execute({
+      id,
+      name,
+      email,
+      password,
+    });
+
+    res.status(200).json({ user });
   }
 }
