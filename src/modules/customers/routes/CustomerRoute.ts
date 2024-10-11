@@ -14,6 +14,12 @@ customerRouter.post(
 
 customerRouter.get('/customers/:id', customerController.read);
 
+customerRouter.patch(
+  '/customers/:id',
+  customerServices.validateCustomerUpdate,
+  customerController.update,
+);
+
 customerRouter.delete('/customers/:id', customerController.delete);
 
 export default customerRouter;

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import CustomerRepository from '../repositories/CustomerRepository';
 import validator from 'validator';
 
-const customerRepository = new CustomerRepository();
+const customerClassRepository = new CustomerRepository();
 
 function isValidPhone(phone: string): boolean {
   return validator.isMobilePhone(phone, ['pt-BR']);
@@ -83,7 +83,8 @@ class CustomerServices {
       return;
     }
 
-    const customerExistsCpf = await customerRepository.findCustomerByCpf(cpf);
+    const customerExistsCpf =
+      await customerClassRepository.findCustomerByCpf(cpf);
     if (customerExistsCpf) {
       res
         .status(400)
@@ -92,7 +93,7 @@ class CustomerServices {
     }
 
     const customerExistsEmail =
-      await customerRepository.findCustomerByEmail(email);
+      await customerClassRepository.findCustomerByEmail(email);
     if (customerExistsEmail) {
       res
         .status(400)
@@ -102,6 +103,68 @@ class CustomerServices {
 
     const [day, month, year] = birthDate.split('/');
     req.body.birthDate = new Date(`${year}-${month}-${day}`);
+    next();
+  }
+
+  async validateCustomerUpdate(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    const { fullName, birthDate, cpf, email, phone } = req.body;
+
+    if (fullName && (typeof fullName !== 'string' || fullName.length < 3)) {
+      res.status(400).json({
+        message: 'Name must be letters and must be more than 3 letters',
+      });
+      return;
+    }
+
+    if (birthDate) {
+      if (!isValidDate(birthDate)) {
+        res.status(400).json({ message: 'Send a valid date' });
+        return;
+      }
+      const [day, month, year] = birthDate.split('/');
+      req.body.birthDate = new Date(`${year}-${month}-${day}`);
+    }
+
+    if (email) {
+      if (!validator.isEmail(email)) {
+        res.status(400).json({ message: 'Send a valid email' });
+        return;
+      }
+      const customerExistsEmail =
+        await customerClassRepository.findCustomerByEmail(email);
+      if (customerExistsEmail) {
+        res
+          .status(400)
+          .json({ message: 'A customer with this email already exists.' });
+        return;
+      }
+    }
+
+    if (phone) {
+      if (!isValidPhone(phone)) {
+        res.status(400).json({ message: 'Send a valid phone number' });
+        return;
+      }
+    }
+
+    if (cpf) {
+      if (!isValidCpf(cpf)) {
+        res.status(400).json({ message: 'Send a valid CPF' });
+        return;
+      }
+      const customerExistsCpf =
+        await customerClassRepository.findCustomerByCpf(cpf);
+      if (customerExistsCpf) {
+        res
+          .status(400)
+          .json({ message: 'A customer with this CPF already exists.' });
+        return;
+      }
+    }
 
     next();
   }

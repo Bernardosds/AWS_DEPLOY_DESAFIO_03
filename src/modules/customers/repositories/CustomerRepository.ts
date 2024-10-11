@@ -1,5 +1,5 @@
 import Customer from '../entities/Customer';
-import ICustomer from '../interfaces/ICustomer';
+import ICustomer from '../interface/ICustomer';
 import AppDataSource from '../../../db/data-source';
 
 export const customerRepositorySource = AppDataSource.getRepository(Customer);

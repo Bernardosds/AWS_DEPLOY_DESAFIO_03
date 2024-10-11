@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import ICustomer from '../interfaces/ICustomer';
+import ICustomer from '../interface/ICustomer';
 import { validate as isUuid } from 'uuid';
 import { customerRepositorySource } from '../repositories/CustomerRepository';
 
@@ -66,6 +66,25 @@ class CustomerController {
     res.status(200).json({ message: 'Customer deleted' });
     return;
   }
-}
 
+  async update(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
+    const customerData: ICustomer = req.body;
+
+    try {
+      const existsCustomer = await customerRepositorySource.findOne({
+        where: { id },
+      });
+      if (!existsCustomer) {
+        res.status(404).json({ message: 'Customer not found' });
+        return;
+      }
+      await customerRepositorySource.update({ id }, customerData);
+      res.status(200).json({ message: 'Customer updated' });
+      return;
+    } catch (error) {
+      res.status(500).json({ message: 'Internal Server Error', error });
+    }
+  }
+}
 export default CustomerController;
