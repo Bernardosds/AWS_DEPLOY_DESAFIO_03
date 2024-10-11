@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "ts-node-dev src/server.ts",
-    "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js"
+    "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "migration:generate": "ts-node ./node_modules/typeorm/cli.js -d ./src/db/data-source.ts migration:generate ./src/db/migration",
+    "migration:run": "ts-node ./node_modules/typeorm/cli.js -d ./src/db/data-source.ts  migration:run"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +16,7 @@
   "description": "",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "celebrate": "^15.0.3",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
@@ -22,7 +25,6 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.3",
     "reflect-metadata": "^0.2.2",
-    "typeorm": "^0.3.20",
     "uuid": "^10.0.0",
     "validator": "^13.12.0"
   },
@@ -43,6 +45,8 @@
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "typeorm": "^0.3.20",
+    "typeorm-ts-node-commonjs": "^0.3.20",
     "typescript": "^5.6.2",
     "typescript-eslint": "^8.8.1"
   },

@@ -1,6 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
 import CarStatus from '../interface/CarStatus';
-
+import RentalRequest from '../../rental_requests/entities/rental_request';
 @Entity('cars')
 class Cars {
   @PrimaryGeneratedColumn('uuid')
@@ -32,6 +32,10 @@ class Cars {
     nullable: false,
   })
   status?: CarStatus;
+
+  @OneToOne(() => RentalRequest, (rentalRequest) => rentalRequest.cars)
+  rental_request!: RentalRequest;
+
 
   @Column('datetime', { nullable: false, default: () => 'CURRENT_TIMESTAMP' })
   registration_date?: Date;

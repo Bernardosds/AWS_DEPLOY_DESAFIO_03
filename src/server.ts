@@ -2,10 +2,9 @@ import 'reflect-metadata';
 import express, { Request, Response, NextFunction } from 'express';
 import 'express-async-errors';
 import cors from 'cors';
-import { AppDataSource } from './db/DataSource';
-import userRouter from './modules/users/routes/UsersRoutes';
-import { errors } from 'celebrate';
-import AppError from './shared/errors/AppError';
+import AppDataSource from './db/data-source';
+import 'dotenv/config';
+import customerRouter from './modules/customers/routes/CustomerRoute';
 
 const app = express();
 
@@ -13,27 +12,7 @@ app.use(cors());
 
 app.use(express.json());
 
-app.use('/users', userRouter);
-
-app.use(errors());
-
-app.use(
-  (error: unknown, req: Request, res: Response, next: NextFunction): void => {
-    if (error instanceof AppError) {
-      res.status(error.statusCode).json({
-        status: 'error',
-        message: error.message,
-      });
-    }
-
-    res.status(500).json({
-      status: 'error',
-      message: 'Internal server error',
-    });
-
-    return next(error);
-  },
-);
+app.use(customerRouter);
 
 AppDataSource.initialize()
   .then(() => {

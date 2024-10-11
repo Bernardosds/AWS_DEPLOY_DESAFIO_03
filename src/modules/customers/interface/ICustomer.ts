@@ -1,4 +1,4 @@
-interface ICustomer {
+export default interface ICustomer {
   id?: string;
   fullName: string;
   birthDate: Date;
@@ -9,4 +9,4 @@ interface ICustomer {
   deletedAt?: Date;
 }
 
-export default ICustomer;
+
