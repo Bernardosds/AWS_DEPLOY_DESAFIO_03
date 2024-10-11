@@ -4,7 +4,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   DeleteDateColumn,
-  OneToMany
+  OneToOne
 } from 'typeorm';
 
 import ICustomer from '../interfaces/ICustomer'; 
@@ -35,8 +35,9 @@ class Customer implements ICustomer{
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt?: Date;
 
-  @OneToMany(() => RentalRequest, (rentalRequest) => rentalRequest.customer)
-  rental_requests!: RentalRequest[];
+ 
+  @OneToOne(() => RentalRequest, (rentalRequest) => rentalRequest.cars)
+  rentalRequest!: RentalRequest
 }
   
 

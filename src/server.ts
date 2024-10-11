@@ -1,18 +1,18 @@
 import 'reflect-metadata';
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import 'express-async-errors';
 import cors from 'cors';
 import AppDataSource from './db/data-source';
 import 'dotenv/config';
-import customerRouter from './modules/customers/routes/CustomerRoute';
-
+//import customerRouter from './modules/customers/routes/CustomerRoute';
+import RentalRequest from './modules/rental_requests/entities/rental_request';
 const app = express();
 
 app.use(cors());
 
 app.use(express.json());
 
-app.use(customerRouter);
+app.use();
 
 AppDataSource.initialize()
   .then(() => {
