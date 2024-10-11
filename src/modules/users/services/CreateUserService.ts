@@ -1,4 +1,4 @@
-import Error from '../../../shared/errors/Errors';
+import AppError from '../../../shared/errors/AppError';
 import IUser from '../models/IUser';
 import IUsersRepository from '../models/IUsersRepository';
 import IHashProvider from '../models/IHashProvider';
@@ -15,35 +15,35 @@ export default class CreateUser implements ICreateUserService {
 
   public async execute({ name, email, password }: IUser): Promise<string> {
     if (!name) {
-      throw new Error('full name is required', 400);
+      throw new AppError('full name is required', 400);
     }
 
     if (name.split(' ').length < 2) {
-      throw new Error('full name is required', 400);
+      throw new AppError('full name is required', 400);
     }
 
     if (!email) {
-      throw new Error('email is required', 400);
+      throw new AppError('email is required', 400);
     }
 
     const emailRegex = /^[\w\-.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
     if (!emailRegex.test(email)) {
-      throw new Error('email format is invalid', 400);
+      throw new AppError('email format is invalid', 400);
     }
 
     const emailDuplicate = await this.usersRepository.findByEmail(email);
 
     if (emailDuplicate) {
-      throw new Error('a user with this email address already exists', 409);
+      throw new AppError('a user with this email address already exists', 409);
     }
 
     if (!password) {
-      throw new Error('password is required', 400);
+      throw new AppError('password is required', 400);
     }
 
     if (password.length < 8) {
-      throw new Error('password must be at least 8 characters long', 400);
+      throw new AppError('password must be at least 8 characters long', 400);
     }
 
     const hashedPassword = await this.hashProvider.generateHash(password);
@@ -55,7 +55,7 @@ export default class CreateUser implements ICreateUserService {
     });
 
     if (!userId) {
-      throw new Error('failed to create user', 500);
+      throw new AppError('failed to create user', 500);
     }
 
     return userId;
