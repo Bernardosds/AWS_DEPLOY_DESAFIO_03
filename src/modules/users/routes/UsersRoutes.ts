@@ -5,7 +5,11 @@ import CreateUserService from '../services/CreateUserService';
 import UsersController from '../controllers/UsersController';
 import User from '../entities/User';
 import { celebrate, Joi, Segments } from 'celebrate';
+<<<<<<< Updated upstream
 import AppDataSource  from '../../../db/data-source';
+=======
+import AppDataSource from '../../../db/data-source'; 
+>>>>>>> Stashed changes
 
 
 const userRouter = Router();

@@ -34,7 +34,7 @@ class Cars {
   status?: CarStatus;
 
   @OneToOne(() => RentalRequest, (rentalRequest) => rentalRequest.cars)
-  rental_request!: RentalRequest;
+  rentalRequest!: RentalRequest;
 
 
   @Column('datetime', { nullable: false, default: () => 'CURRENT_TIMESTAMP' })

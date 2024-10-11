@@ -7,7 +7,8 @@ import {
   OneToOne
 } from 'typeorm';
 
-import ICustomer from '../interfaces/ICustomer'; 
+import ICustomer from '../interface/ICustomer'; 
+
 import RentalRequest from '../../rental_requests/entities/rental_request'
 @Entity('customers')
 class Customer implements ICustomer{
@@ -35,7 +36,7 @@ class Customer implements ICustomer{
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt?: Date;
 
- 
+
   @OneToOne(() => RentalRequest, (rentalRequest) => rentalRequest.cars)
   rentalRequest!: RentalRequest
 }

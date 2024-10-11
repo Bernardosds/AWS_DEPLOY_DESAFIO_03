@@ -40,14 +40,15 @@ export class RentalRequestController {
                     return res.json("Does't exist")
                 } 
                 
-                    if(checkRequest != null) {
+                    if(checkRequest.length > 0) {
                         return res.json("Ja existe um cadastro no sistema")
                     }
 
         const orderRequest = this.requestRepository.create({
-            customer: cpf_cliente,
+            customer,
             cars: car,
         })
+        
         
         await this.requestRepository.save(orderRequest)
         return res.json("OK")

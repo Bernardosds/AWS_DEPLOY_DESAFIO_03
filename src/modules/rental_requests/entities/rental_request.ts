@@ -19,9 +19,6 @@ export default class RentalRequest implements IRentalRequestEntity {
     nullable: false,})
     statusRequest!: string;
 
-    @Column({type: 'varchar', default:null})
-    cpf_pedido!: string
-        
     @Column({type: 'varchar', default: null})
     cep!: string;
 
@@ -53,9 +50,10 @@ export default class RentalRequest implements IRentalRequestEntity {
     fine!: number;
 
     @OneToOne(() => Customer, (customer) => customer.rentalRequest)
+    @JoinColumn()
     customer!: Customer;
 
-    @OneToOne(() => Cars, (cars) => cars.rental_request)
+    @OneToOne(() => Cars, (cars) => cars.rentalRequest)
     @JoinColumn()
     cars!: Cars;
     

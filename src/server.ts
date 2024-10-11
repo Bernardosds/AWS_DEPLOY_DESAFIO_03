@@ -5,14 +5,17 @@ import cors from 'cors';
 import AppDataSource from './db/data-source';
 import 'dotenv/config';
 //import customerRouter from './modules/customers/routes/CustomerRoute';
-import RentalRequest from './modules/rental_requests/entities/rental_request';
+//import RentalRequest from './modules/rental_requests/entities/rental_request';
+import rentalRouter from '../src/modules/rental_requests/routes/routes.rental.request';
+import loginRouter from './modules/login/routes/LoginRoute';
 const app = express();
 
 app.use(cors());
 
 app.use(express.json());
 
-app.use();
+app.use(loginRouter);
+app.use(rentalRouter);
 
 AppDataSource.initialize()
   .then(() => {
