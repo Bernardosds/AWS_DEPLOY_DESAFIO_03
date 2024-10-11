@@ -1,3 +1,3 @@
-import { formatPlate } from '../formatters/createCarFormatter';
+import { formatPlate } from './formatPlate';
 
 export { formatPlate };
