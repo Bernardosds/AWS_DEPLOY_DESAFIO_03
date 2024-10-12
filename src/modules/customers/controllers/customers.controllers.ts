@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import ICustomer from '../interface/ICustomer';
 import { validate as isUuid } from 'uuid';
 import { customerRepositorySource } from '../repositories/CustomerRepository';
+import IPagination from '../interface/IPagination';
+import ReadCustomerService from '../services/ReadCustomerService';
 
 class CustomerController {
   async create(req: Request, res: Response): Promise<void> {
@@ -18,7 +20,7 @@ class CustomerController {
     }
   }
 
-  async read(req: Request, res: Response): Promise<void> {
+  async readById(req: Request, res: Response): Promise<void> {
     const { id } = req.params;
     try {
       const customer = await customerRepositorySource.findOneBy({ id });
@@ -33,6 +35,24 @@ class CustomerController {
         return;
       }
       res.status(200).json({ customer });
+      return;
+    } catch (error) {
+      res.status(500).json({ message: 'Internal Server Error', error });
+      return;
+    }
+  }
+
+  async read(req: Request, res: Response): Promise<void> {
+    const queryParams: IPagination = req.query as unknown as IPagination;
+
+    try {
+      const result = await ReadCustomerService.listCustomers(queryParams);
+      if (result.customers.length === 0) {
+        res.status(404).json({ message: 'No customers found' });
+        return;
+      }
+
+      res.status(200).json(result);
       return;
     } catch (error) {
       res.status(500).json({ message: 'Internal Server Error', error });
