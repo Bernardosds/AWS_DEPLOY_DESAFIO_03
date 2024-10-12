@@ -6,25 +6,25 @@ class Cars {
   @PrimaryGeneratedColumn('uuid')
   id?: string;
 
-  @Column('varchar', { length: 7, nullable: false })
+  @Column({ type: 'varchar', length: 7, nullable: false })
   plate?: string;
 
-  @Column('varchar', { length: 45, nullable: false })
+  @Column({ type: 'varchar', length: 45, nullable: false })
   brand?: string;
 
-  @Column('varchar', { length: 90, nullable: false })
+  @Column({ type: 'varchar', length: 90, nullable: false })
   model?: string;
 
-  @Column('int', { unsigned: true, nullable: true })
+  @Column({ type: 'int', unsigned: true, default: 0 })
   mileage?: number;
 
-  @Column('int', { nullable: false })
+  @Column({ type: 'int', nullable: false })
   year?: number;
 
-  @Column('varchar', { length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   items?: string;
 
-  @Column('float', { nullable: false })
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
   daily_price?: number;
 
   @Column('enum', {
@@ -33,10 +33,17 @@ class Cars {
   })
   status?: CarStatus;
 
-  @Column('datetime', { nullable: false, default: () => 'CURRENT_TIMESTAMP' })
+  @Column({
+    type: 'datetime',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   registration_date?: Date;
 
-  @Column('datetime', { nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column({
+    type: 'datetime',
+    nullable: true,
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
   updated_time?: Date;
 }
 

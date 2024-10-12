@@ -1,20 +1,29 @@
-import { NextFunction, Request, Response } from 'express';
-import { AppDataSource } from '../../../db/data-source';
+import { Request, Response } from 'express';
+import AppDataSource from '../../../db/data-source';
 import Cars from '../entities/Cars';
 import ICars from '../interface/ICars';
-import { createCarValidator, updateCarValidator } from '../services/validator';
-import CarsService from '../services/CarsService';
-import listCarsService from '../services/listCarsService';
+import { createCarValidator, updateCarValidator } from '../services/validators';
+import CarsService from '../services';
 import Joi from 'joi';
 
 export class CarsController {
-  private carsService: CarsService;
-  private listCarsService: listCarsService;
-
-  constructor() {
-    this.carsService = new CarsService();
-    this.listCarsService = new listCarsService();
-  }
+  constructor(
+    private createCarService: InstanceType<
+      (typeof CarsService)['CreateCarService']
+    >,
+    private listCarsService: InstanceType<
+      (typeof CarsService)['ListCarsService']
+    >,
+    private showCarService: InstanceType<
+      (typeof CarsService)['ShowCarService']
+    >,
+    private updateCarService: InstanceType<
+      (typeof CarsService)['UpdateCarService']
+    >,
+    private deleteCarService: InstanceType<
+      (typeof CarsService)['DeleteCarService']
+    >,
+  ) {}
 
   carsRepository = AppDataSource.getRepository(Cars);
 
@@ -27,9 +36,22 @@ export class CarsController {
         return;
       }
 
-      const newCar = await this.carsService.createCar(req.body);
+      const newCar = await this.createCarService.createCar(req.body);
 
       res.status(201).json(newCar);
+    } catch (error) {
+      const typedError = error as Error;
+      res.status(400).json({ message: typedError.message });
+    }
+  };
+
+  getById = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const id = req.params.id.trim();
+
+      const car = await this.showCarService.findCarById(id);
+
+      res.status(200).json(car);
     } catch (error) {
       const typedError = error as Error;
       res.status(400).json({ message: typedError.message });
@@ -53,19 +75,6 @@ export class CarsController {
     }
   };
 
-  getById = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const id = req.params.id.trim();
-
-      const car = await this.carsService.findCarById(id);
-
-      res.status(200).json(car);
-    } catch (error) {
-      const typedError = error as Error;
-      res.status(400).json({ message: typedError.message });
-    }
-  };
-
   updateCar = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = req.params.id.trim();
@@ -83,7 +92,7 @@ export class CarsController {
         return;
       }
 
-      const updatedCar = await this.carsService.updateCar(id, updates);
+      const updatedCar = await this.updateCarService.updateCar(id, updates);
 
       res.status(201).json(updatedCar);
     } catch (error) {
@@ -96,7 +105,7 @@ export class CarsController {
     const id = req.params.id.trim();
 
     try {
-      await this.carsService.deleteCar(id);
+      await this.deleteCarService.deleteCar(id);
 
       res.status(200).json({ message: 'Car deleted successfully' });
     } catch (error) {

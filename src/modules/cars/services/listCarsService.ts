@@ -1,10 +1,10 @@
 import Cars from '../entities/Cars';
-import { AppDataSource } from '../../../db/data-source';
+import AppDataSource from '../../../db/data-source';
 import IFilter from '../interface/IFilter';
 import ICarsResponse from '../interface/ICarsResponse';
-import { listCarValidator } from './validator';
+import { listCarValidator } from './validators';
 
-class listCarsService {
+class ListCarsService {
   private carsRepository = AppDataSource.getRepository(Cars);
 
   listCars = async (filters: IFilter): Promise<ICarsResponse> => {
@@ -97,4 +97,4 @@ class listCarsService {
   };
 }
 
-export default listCarsService;
+export default ListCarsService;
