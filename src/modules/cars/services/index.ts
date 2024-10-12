@@ -1,8 +1,8 @@
-import CreateCarService from './createCarService';
-import ShowCarService from './showCarService';
-import ListCarsService from './listCarsService';
-import UpdateCarService from './updateCarService';
-import DeleteCarService from './deleteCarService';
+import CreateCarService from './CreateCarService';
+import ShowCarService from './ShowCarService';
+import ListCarsService from './ListCarsService';
+import UpdateCarService from './UpdateCarService';
+import DeleteCarService from './DeleteCarService';
 
 export default {
   CreateCarService,

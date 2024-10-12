@@ -8,9 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import IRentalRequestEntity from '../interfaces/IRentalRequestEntity';
-import Customer from '../../customers/entities/Customer';
 import Cars from '../../cars/entities/Cars';
-
 @Entity('rental_requests')
 export default class RentalRequest implements IRentalRequestEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -54,10 +52,6 @@ export default class RentalRequest implements IRentalRequestEntity {
 
   @Column()
   fine!: number;
-
-  @OneToOne(() => Customer, customer => customer.rentalRequest)
-  @JoinColumn()
-  customer!: Customer;
 
   @OneToOne(() => Cars, cars => cars.rentalRequest)
   @JoinColumn()

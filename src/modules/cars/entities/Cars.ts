@@ -33,18 +33,10 @@ class Cars {
   })
   status?: CarStatus;
 
-<<<<<<< HEAD
-  @Column({
-    type: 'datetime',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-=======
-  @OneToOne(() => RentalRequest, (rentalRequest) => rentalRequest.cars)
+  @OneToOne(() => RentalRequest, rentalRequest => rentalRequest.cars)
   rentalRequest!: RentalRequest;
 
-
   @Column('datetime', { nullable: false, default: () => 'CURRENT_TIMESTAMP' })
->>>>>>> f1e142729cbb38a0d38a10cb7ddf1c8c10b9518d
   registration_date?: Date;
 
   @Column({
