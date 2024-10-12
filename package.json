@@ -7,6 +7,7 @@
     "start": "ts-node-dev src/server.ts",
     "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js",
     "migration:create": "npm run typeorm migration:create",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "migration:generate": "ts-node ./node_modules/typeorm/cli.js -d ./src/db/data-source.ts migration:generate ./src/db/migration",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js -d ./src/db/data-source.ts  migration:run"
   },
@@ -16,10 +17,12 @@
   "description": "",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "celebrate": "^15.0.3",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
-    "express": "^4.21.1",
+    "express": "^4.21.0",
+    "express-async-errors": "^3.1.1",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.3",
@@ -33,7 +36,10 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/joi": "^17.2.2",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.7.4",
+    "@types/uuid": "^10.0.0",
+    "@types/validator": "^13.12.2",
     "eslint": "^9.12.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
@@ -42,7 +48,9 @@
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.6.3",
+    "typeorm": "^0.3.20",
+    "typeorm-ts-node-commonjs": "^0.3.20",
+    "typescript": "^5.6.2",
     "typescript-eslint": "^8.8.1"
   },
   "overrides": {

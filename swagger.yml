@@ -1,0 +1,326 @@
+openapi: 3.0.3
+info:
+  title: Compass Car API 1.0
+  description: |-
+    API para o gerenciamento da locação de carros. Permite o gerenciamento de usuários, o cadastro de clientes, o controle de carros disponíveis para locação e a criação e acompanhamento de pedidos de locação.
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+servers:
+  - url: https://petstore3.swagger.io/api/v3
+tags:
+  - name: users
+    description: Gerenciamento das informações sobre usuários do sistema
+  - name: clients
+    description: Gerenciamento de clientes
+  - name: cars
+    description: Gerenciamento de carros disponíveis para locação
+  - name: orders
+    description: Gerenciamento de pedidos de locação
+paths:
+  /users:
+    post:
+      tags:
+        - users
+      description: Criação de um novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  description: ID do usuário
+                name:
+                  type: string
+                  description: Nome completo do usuário
+                email:
+                  type: string
+                  format: email
+                  description: Email do usuário
+                password:
+                  type: string
+                  format: password
+                  description: Senha do usuário (criptografada)
+      responses:
+        '201':
+          description: Usuário criado com sucesso, retorna o ID do usuário.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User created successfully."
+                  userId:
+                    type: string
+                    format: uuid
+                    example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        '409':
+          description: Conflito de e-mail já registrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There is already a user registered with this email."
+        '400':
+          description: Informações ausentes ou inválidas.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Incorrect or missing data."          
+    get:
+      tags:
+        - users
+      description: Listagem de usuários com filtros e paginação
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: query
+          description: Filtrar por parte do nome do usuário
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: Filtrar por parte do e-mail
+          schema:
+            type: string
+        - name: excluded
+          in: query
+          description: Filtrar por status de exclusão (sim/não)
+          schema:
+            type: boolean
+        - name: sort
+          in: query
+          description: Campo de ordenação (nome, data de cadastro, data de exclusão)
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Página atual da lista
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: Tamanho da página
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de usuários retornada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+        '204':
+          description: Nenhum usuário encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found."
+        '400':
+          description: Parâmetros inválidos.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid parameters."
+  /users/{id}:
+    get:
+      tags:
+        - users
+      description: Busca um usuário por ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID do usuário
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Informações detalhadas do usuário.
+          schema:
+          $ref: '#/components/schemas/User'
+        '404':
+          description: Usuário não encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found."
+        '400':
+          description: ID inválido.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid ID."
+    put:
+      tags:
+        - users
+      description: Atualizar informações de um usuário
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID do usuário
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nome completo do usuário
+                email:
+                  type: string
+                  format: email
+                  description: Email do usuário
+                password:
+                  type: string
+                  format: password
+                  description: Senha do usuário (criptografada)
+      responses:
+        '200':
+          description: Informações detalhadas do usuário atualizadas.
+          schema:
+          $ref: '#/components/schemas/User'
+        '404':
+          description: Usuário não encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found."
+        '400':
+          description: ID inválido.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid ID."
+    delete:
+      tags:
+        - users
+      description: Soft delete de um usuário (marcar como excluído)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID do usuário
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Usuário excluído com sucesso.
+          content:
+            {}
+        '404':
+          description: Usuário não encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found."
+        '400':
+          description: Informações inválidas.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid data."
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        name:
+          type: string
+          example: "Jane Doe"
+        email:
+          type: string
+          format: email
+          example: "jane.doe@example.com"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-10-01T10:00:00Z"
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+    UserList:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 2
+        totalPages:
+          type: integer
+          example: 1
+        currentPage:
+          type: integer
+          example: 1
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'

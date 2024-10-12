@@ -6,9 +6,6 @@ export default [
   {
     files: ['**/*.{js,mjs,cjs,ts}'],
     languageOptions: { globals: globals.browser },
-    rules: {
-      'no-console': 'warn',
-    },
     ignores: ['node_modules/', 'build/', '*.js'],
   },
   pluginJs.configs.recommended,
