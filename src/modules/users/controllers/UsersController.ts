@@ -37,29 +37,36 @@ export default class UsersController {
   }
 
   async listUsers(req: Request, res: Response): Promise<void> {
-    let filters = {};
-
-    let sort = {
-      field: 'createdAt' as keyof IUser,
-      order: 'ASC' as 'ASC' | 'DESC',
+    type Filters = {
+      name?: string;
+      email?: string;
+      isDeleted?: boolean;
     };
 
-    let pagination = {
-      page: 1,
-      size: 10,
+    type Sort = {
+      field: keyof IUser;
+      order: 'ASC' | 'DESC';
     };
 
-    if (req.query.filters) {
-      filters = JSON.parse(req.query.filters as string);
-    }
+    type Pagination = {
+      page: number;
+      size: number;
+    };
 
-    if (req.query.sort) {
-      sort = JSON.parse(req.query.sort as string);
-    }
+    const filters: Filters = (req.query.filters as Filters) || {};
+    const sort: Sort = (req.query.sort as Sort) || {
+      field: 'createdAt',
+      order: 'ASC',
+    };
 
-    if (req.query.pagination) {
-      pagination = JSON.parse(req.query.pagination as string);
-    }
+    const paginationQuery = req.query.pagination as
+      | { page?: string; size?: string }
+      | undefined;
+
+    const pagination: Pagination = {
+      page: parseInt((paginationQuery?.page as string) || '1', 10),
+      size: parseInt((paginationQuery?.size as string) || '10', 10),
+    };
 
     const users: IPagedList<IUser> = await this.listUsersService.execute({
       filters,

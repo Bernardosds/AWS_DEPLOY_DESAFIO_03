@@ -56,10 +56,6 @@ export default class UpdateUserService implements IUpdateUserService {
         throw new AppError('password must be at least 8 characters long', 400);
       }
 
-      if (password) {
-        password = await this.hashProvider.generateHash(password);
-      }
-
       user.password = await this.hashProvider.generateHash(password);
     }
 

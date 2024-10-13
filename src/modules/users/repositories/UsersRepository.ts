@@ -1,4 +1,4 @@
-import { Repository, Like, Not, IsNull } from 'typeorm';
+import { Repository } from 'typeorm';
 import User from '../entities/User';
 import IUsersRepository from '../models/IUsersRepository';
 import IFindUsersOptions from '../models/IFindUsersOptions';
@@ -27,7 +27,7 @@ export default class UsersRepository implements IUsersRepository {
       where: { email },
     });
 
-    return user;
+    return user || null;
   }
 
   public async findById(id: string): Promise<IUser | null> {
@@ -49,18 +49,35 @@ export default class UsersRepository implements IUsersRepository {
   public async findAll(options: IFindUsersOptions): Promise<[IUser[], number]> {
     const { filters, sort, pagination } = options;
 
-    const [users, count] = await this.usersRepository.findAndCount({
-      where: {
-        name: filters.name ? Like(`%${filters.name}%`) : undefined,
-        email: filters.email ? Like(`%${filters.email}%`) : undefined,
-        deletedAt: filters.isDeleted ? Not(IsNull()) : IsNull(),
-      },
-      order: {
-        [sort.field]: sort.order,
-      },
-      skip: (pagination.page - 1) * pagination.size,
-      take: pagination.size,
-    });
+    const queryBuilder = this.usersRepository.createQueryBuilder('user');
+
+    if (filters.name) {
+      queryBuilder.andWhere('user.name LIKE : name', {
+        name: `%${filters.name.trim()}%`,
+      });
+    }
+
+    if (filters.email) {
+      queryBuilder.andWhere('user.email LIKE : email', {
+        email: `%${filters.email.trim()}%`,
+      });
+    }
+
+    if (filters.isDeleted !== undefined) {
+      queryBuilder.andWhere(
+        'user.deletedAt IS' + (filters.isDeleted ? 'NOT NULL' : 'NULL'),
+      );
+    }
+
+    if (sort && sort.field && sort.order) {
+      queryBuilder.orderBy(`user.${sort.field}`, sort.order);
+    }
+
+    queryBuilder
+      .skip((pagination.page - 1) * pagination.size)
+      .take(pagination.size);
+
+    const [users, count] = await queryBuilder.getManyAndCount();
 
     return [users, count];
   }

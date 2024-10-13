@@ -1,50 +1,43 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import AppDataSource from '../../db/data-source'; 
-import User from '../../modules/users/entities/User'; 
 import 'dotenv/config';
+import AppError from '../errors/AppError';
+import authConfig from '../../config/auth';
 
-
-type JwtPayload = {
-    id: string;
-};
-
-interface AuthenticatedRequest extends Request {
-    usuario?: User;
+interface ITokenPayload {
+  iat: number; 
+  exp: number; 
+  email: string; 
 }
 
-export const authMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<Response | undefined | string > => {
-    const { authorization } = req.headers;
+interface CustomRequest extends Request {
+  user?: {
+    email: string; 
+  };
+}
+
+export const authMiddleware = (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+): void => {
+  const { authorization } = req.headers;
+
+  if (!authorization) {
+    throw new AppError('jwt token is missing', 401); 
+  }
+
+  const token = authorization.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, authConfig.jwt.secret) as ITokenPayload; 
     
-    if (!authorization) {
-        return res.status(403).json({ message: "Não autorizado, token não provido" });
-    }
+    req.user = {
+      email: decoded.email,
+    };
 
-    try {
-        const token = authorization.split(' ')[1];
-        
-        // Verify the token and extract the payload
-        const decoded = jwt.verify(token, process.env.API_KEY as string) as JwtPayload;
-        
-        // Fetch the user from the database
-        const userRepository = AppDataSource.getRepository(User);
-        
-        const usuario = await userRepository.findOne({where: { id: decoded.id }} );
-
-        console.log(usuario);
-
-        if (!usuario) {
-            return res.status(404).json({ message: 'Usuário não encontrado' });
-        }
-
-        // Attach the user to the req object
-        req.usuario = usuario;
-
-        // Continue to the next middleware or route handler
-        next();
-    } catch (error) {
-        console.error('Erro na validação do token:', error);
-        return res.status(401).json({ message: 'Token não válido' });
-    }
+    return next();
+  } catch {
+    throw new AppError('invalid JWT token', 401);
+  }
 };
-
