@@ -3,6 +3,7 @@ import AppDataSource from '../../../db/data-source';
 import IFilter from '../interface/IFilter';
 import ICarsResponse from '../interface/ICarsResponse';
 import { listCarValidator } from './validators';
+import CarStatus from '../interface/CarStatus';
 
 class ListCarsService {
   private carsRepository = AppDataSource.getRepository(Cars);
@@ -18,6 +19,8 @@ class ListCarsService {
 
     if (filters.status) {
       queryBuilder.andWhere('car.status = :status', { status: filters.status });
+    } else {
+      queryBuilder.andWhere('car.status != :status', { status: CarStatus.Deleted });
     }
 
     if (filters.plateEnd) {
