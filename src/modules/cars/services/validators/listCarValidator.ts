@@ -13,13 +13,9 @@ const listCarValidator = Joi.object({
   model: Joi.string().optional().trim().messages({
     'string.base': 'Model must be a string',
   }),
-  /*items: Joi.array()
-    .items(Joi.string().trim())
-    .max(5)
-    .optional()
-    .messages({
-      'array.max': 'Cannot have more than 5 items',
-    }),*/
+  items: Joi.array().items(Joi.string().trim()).max(5).optional().messages({
+    'array.max': 'Cannot have more than 5 items',
+  }),
   mileage: Joi.number().min(0).optional().messages({
     'number.base': 'Mileage must be a number',
     'number.min': 'Mileage cannot be negative',

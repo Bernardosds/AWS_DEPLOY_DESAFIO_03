@@ -12,7 +12,7 @@ interface IFilter {
   sortFields?: string;
   sortOrder?: string;
   page?: number;
-  size?: number;
+  limit?: number;
 }
 
 export default IFilter;
