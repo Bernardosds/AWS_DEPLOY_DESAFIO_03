@@ -18,7 +18,7 @@ export default class ListUsersService implements IListUsersService {
     const totalPages = Math.ceil(totalResults / options.pagination.size);
 
     if (users.length === 0) {
-      throw new AppError('Users not found', 404);
+      throw new AppError('', 204);
     }
 
     return {

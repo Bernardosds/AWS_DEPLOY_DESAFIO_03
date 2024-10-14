@@ -21,12 +21,12 @@ export default class UpdateUserService implements IUpdateUserService {
     const user = await this.usersRepository.findById(id);
 
     if (!user) {
-      throw new AppError('user is required', 404);
+      throw new AppError('user not found', 404);
     }
 
     if (name) {
       if (name.split(' ').length < 2) {
-        throw new AppError('full name is required', 400);
+        throw new AppError('name and surname is required', 400);
       }
 
       user.name = name;
@@ -52,17 +52,13 @@ export default class UpdateUserService implements IUpdateUserService {
     }
 
     if (password) {
-      if (password.length < 8) {
-        throw new AppError('password must be at least 8 characters long', 400);
-      }
-
       user.password = await this.hashProvider.generateHash(password);
     }
 
     const updatedUser = await this.usersRepository.update(id, user);
 
     if (!updatedUser) {
-      throw new AppError('Error updating user', 500);
+      throw new AppError('could not update user', 500);
     }
 
     return updatedUser;

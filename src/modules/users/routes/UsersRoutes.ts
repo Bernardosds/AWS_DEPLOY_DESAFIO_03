@@ -5,16 +5,14 @@ import CreateUserService from '../services/CreateUserService';
 import UsersController from '../controllers/UsersController';
 import User from '../entities/User';
 import { celebrate, Joi, Segments } from 'celebrate';
-import AppDataSource  from '../../../db/data-source';
+import {AppDataSource}  from '../../../db/data-source';
 import ListUsersService from '../services/ListUsersService';
-import ShowUserService from '../services/ShowUserService';
 import DeleteUserService from '../services/DeleteUserService';
+import ShowUserService from '../services/ShowUserService';
 import UpdateUserService from '../services/UpdateUserService';
 
 
 const userRouter = Router();
-
-// userRouter.use(authmiddlewarehere);
 
 const userRepository = AppDataSource.getRepository(User);
 const usersRepository = new UsersRepository(userRepository);

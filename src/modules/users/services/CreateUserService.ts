@@ -19,7 +19,7 @@ export default class CreateUser implements ICreateUserService {
     }
 
     if (name.split(' ').length < 2) {
-      throw new AppError('full name is required', 400);
+      throw new AppError('name and surname is required', 400);
     }
 
     if (!email) {
@@ -40,10 +40,6 @@ export default class CreateUser implements ICreateUserService {
 
     if (!password) {
       throw new AppError('password is required', 400);
-    }
-
-    if (password.length < 8) {
-      throw new AppError('password must be at least 8 characters long', 400);
     }
 
     const hashedPassword = await this.hashProvider.generateHash(password);
