@@ -148,6 +148,7 @@ paths:
                     type: string
                     example: "Invalid parameters."
   /users/{id}:
+
     get:
       tags:
         - users
@@ -283,6 +284,171 @@ paths:
                   message:
                     type: string
                     example: "Invalid data."
+  /cars/create:
+    post:
+      tags:
+        - Cars
+      summary: Create a new car
+      requestBody:
+        description: Car object to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarCreate'
+      responses:
+        201:
+          description: Car created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Car'
+        400:
+          description: Validation error
+  /cars/:
+    get:
+      tags:
+        - Cars
+      summary: List all cars
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, deleted]
+          description: Filter by car status
+        - name: plateEnd
+          in: query
+          schema:
+            type: string
+          description: Filter by the last characters of the plate
+        - name: brand
+          in: query
+          schema:
+            type: string
+          description: Filter by brand
+        - name: model
+          in: query
+          schema:
+            type: string
+          description: Filter by model
+        - name: mileage
+          in: query
+          schema:
+            type: integer
+          description: Filter by mileage
+        - name: yearFrom
+          in: query
+          schema:
+            type: integer
+          description: Filter by minimum year
+        - name: yearTo
+          in: query
+          schema:
+            type: integer
+          description: Filter by maximum year
+        - name: dailyPriceMin
+          in: query
+          schema:
+            type: number
+          description: Filter by minimum daily price
+        - name: dailyPriceMax
+          in: query
+          schema:
+            type: number
+          description: Filter by maximum daily price
+        - name: items
+          in: query
+          schema:
+            type: string
+          description: Filter by items (comma-separated values)
+      responses:
+        200:
+          description: A list of cars
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  currentPage:
+                    type: integer
+                  cars:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Car'
+        400:
+          description: Validation error
+  /cars/{id}:
+    get:
+      tags:
+        - Cars
+      summary: Get car by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Car found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Car'
+        404:
+          description: Car not found
+  /cars/update/{id}:
+    patch:
+      tags:
+        - Cars
+      summary: Update car details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Car object with updated data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarUpdate'
+      responses:
+        200:
+          description: Car updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Car'
+        400:
+          description: Validation error
+        404:
+          description: Car not found
+  /cars/delete/{id}:
+    delete:
+      tags:
+        - Cars
+      summary: Delete car by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Car deleted successfully
+        404:
+          description: Car not found
+        500:
+          description: Internal server error
 components:
   schemas:
     User:
@@ -324,3 +490,107 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
+    Car:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        plate:
+          type: string
+          example: ABC1234
+        brand:
+          type: string
+          example: Toyota
+        model:
+          type: string
+          example: Corolla
+        mileage:
+          type: integer
+          example: 50000
+        year:
+          type: integer
+          example: 2020
+        items:
+          type: array
+          items:
+            type: string
+          example: ["Air conditioning", "Leather seats"]
+        daily_price:
+          type: number
+          format: float
+          example: 99.99
+        status:
+          type: string
+          enum: [active, inactive, deleted]
+        registration_date:
+          type: string
+          format: date-time
+        updated_time:
+          type: string
+          format: date-time
+    CarCreate:
+      type: object
+      required:
+        - plate
+        - brand
+        - model
+        - year
+        - items
+        - daily_price
+        - status
+      properties:
+        plate:
+          type: string
+          example: ABC1234
+        brand:
+          type: string
+          example: Toyota
+        model:
+          type: string
+          example: Corolla
+        mileage:
+          type: integer
+          example: 50000
+        year:
+          type: integer
+          example: 2020
+        items:
+          type: array
+          items:
+            type: string
+          example: ["Air conditioning", "Leather seats"]
+        daily_price:
+          type: number
+          format: float
+          example: 99.99
+        status:
+          type: string
+          enum: [active, inactive]
+    CarUpdate:
+      type: object
+      properties:
+        plate:
+          type: string
+          example: ABC1234
+        brand:
+          type: string
+          example: Toyota
+        model:
+          type: string
+          example: Corolla
+        mileage:
+          type: integer
+          example: 50000
+        year:
+          type: integer
+          example: 2020
+        items:
+          type: array
+          items:
+            type: string
+          example: ["Air conditioning", "Leather seats"]
+        daily_price:
+          type: number
+          format: float
+          example: 99.99 
