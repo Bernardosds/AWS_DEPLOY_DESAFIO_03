@@ -21,7 +21,7 @@ export default class Order implements IOrder {
   dateRequest!: Date;
 
   @Column('enum', {
-    enum: ['aberto', 'aprovado', 'fechado', 'cancelado']
+    enum: ['open', 'approved', 'closed', 'cancelled']
   })
   statusRequest!: string;
 

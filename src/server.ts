@@ -5,7 +5,6 @@ import cors from 'cors';
 import AppDataSource from './db/data-source';
 import { errors } from 'celebrate';
 import AppError from './shared/errors/AppError';
-//import rentalRouter from './modules/rental_requests/routes/routes.rental.request';
 import { Request, Response, NextFunction } from 'express';
 import routes from './shared/routes/routes';
 
@@ -15,12 +14,7 @@ app.use(cors());
 
 app.use(express.json());
 
-//app.use('/login', loginRouter);
-
-//app.use('/users',authMiddleware, userRouter);
-
 app.use('/', routes)
-
 
 app.use(errors());
 

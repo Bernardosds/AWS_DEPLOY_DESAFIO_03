@@ -5,7 +5,7 @@ import CreateUserService from '../services/CreateUserService';
 import UsersController from '../controllers/UsersController';
 import User from '../entities/User';
 import { celebrate, Joi, Segments } from 'celebrate';
-import {AppDataSource}  from '../../../db/data-source';
+import AppDataSource from '../../../db/data-source';
 import ListUsersService from '../services/ListUsersService';
 import DeleteUserService from '../services/DeleteUserService';
 import ShowUserService from '../services/ShowUserService';

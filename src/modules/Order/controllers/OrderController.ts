@@ -10,32 +10,32 @@ import { In } from 'typeorm';
 import { parse, isBefore, differenceInDays } from 'date-fns';
 import { formatPlate } from '../../cars/services/formatters';
 
+
 export class OrderController {
   private orderRepository = AppDataSource.getRepository(Order);
   private customerRepository = AppDataSource.getRepository(Customer);
   private carsRepository = AppDataSource.getRepository(Cars);
   
-  
-  async create(req: Request, res: Response): Promise<Response> {
+  async create(req: Request, res: Response): Promise<void> {
     try {
       const { cpf_cliente, plate } = req.body;
 
      
       if (!cpf_cliente || !plate) {
-        throw new AppError("CPF do cliente e placa do carro são obrigatórios.", 400);
+        throw new AppError("Customer CPF and car license plate are mandatory.", 400);
       }
 
       const formattedPlate = formatPlate(plate);
 
       const customer = await this.customerRepository.findOne({ where: { cpf: cpf_cliente } });
       if (!customer) {
-        throw new AppError("Cliente não encontrado.", 404);
+        throw new AppError('Customer not found.', 404);
       }
 
      
       const car = await this.carsRepository.findOne({ where: { plate: formattedPlate } });
       if (!car) {
-        throw new AppError("Carro não encontrado.", 404);
+        throw new AppError("Car not found.", 404);
       }
 
      
@@ -45,37 +45,37 @@ export class OrderController {
           customer: {
             cpf: cpf_cliente,
           },
-          statusRequest: In(['aberto', 'aprovado']),
+          statusRequest: In(['open', 'accpeted']),
         },
       });
 
       if (existingOrder) {
-        throw new AppError("O cliente já possui um pedido em aberto.", 400);
+        throw new AppError("The customer already has an open order.", 400);
       }
 
      
       const orderRequest = this.orderRepository.create({
         customer: customer,
         car: car,
-        statusRequest: "aberto",
+        statusRequest: "open",
       });
 
       await this.orderRepository.save(orderRequest);
 
-      return res.status(201).json({
+       res.status(201).json({
         status: 'success',
         data: orderRequest,
       });
     } catch (error) {
-      console.error(error);
+      
       if (error instanceof AppError) {
-        return res.status(error.statusCode).json({ status: 'error', message: error.message });
+        throw new AppError(`Server error ${error}`,  400)
       }
-      return res.status(500).json({ status: 'error', message: "Erro interno do servidor." });
+     
     }
   }
 
-  async showById(req: Request, res: Response): Promise<Response> {
+  async showById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       const rental = await this.orderRepository
@@ -110,49 +110,39 @@ export class OrderController {
         .getOne();
 
       if (!rental) {
-        return res.status(404).json({ status: 'error', message: "Pedido de aluguel não encontrado." });
+        res.status(404).json({ status: 'error', message: "Rental application not found." });
       }
 
-      rental.rentalTax = Number(rental.rentalTax);
-      rental.totalValue = Number(rental.totalValue);
-      rental.car.daily_price = Number(rental.car.daily_price);
-
-      if (typeof rental.car.items === 'string') {
-        rental.car.items = JSON.parse(rental.car.items);
-      }
-
-      return res.status(200).json({
+      res.status(200).json({
         status: 'success',
         data: rental,
       });
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({ status: 'error', message: "Erro ao buscar o pedido de aluguel.", error: error.message });
+      throw new AppError(`Server error ${error}`,  400)
     }
   }
 
-  async show(req: Request, res: Response): Promise<Response> {
+  async show(req: Request, res: Response): Promise<void> {
     try {
       const { status, cpf, startDate, endDate } = req.query;
-      let { page = '1', limit = '10', order = 'dateRequest', direction = 'DESC' } = req.query;
-
-      // Validar e converter os parâmetros de paginação
+      const { page = '1', limit = '10', order = 'dateRequest', direction = 'DESC' } = req.query;
+      
       const pageNumber = parseInt(page as string, 10);
       const limitNumber = parseInt(limit as string, 10);
 
       if (isNaN(pageNumber) || pageNumber < 1) {
-        throw new AppError("Página inválida.", 400);
+        throw new AppError("Invalid page.", 400);
       }
 
       if (isNaN(limitNumber) || limitNumber < 1) {
-        throw new AppError("Limite inválido.", 400);
+        throw new AppError("Invalid limit.", 400);
       }
 
       const validOrderFields = ['dateRequest'];
       const validDirections = ['ASC', 'DESC'];
 
       const orderField = validOrderFields.includes(order as string) ? order : 'dateRequest';
-      const orderDirection = validDirections.includes(direction?.toString().toUpperCase() || 'DESC') ? direction.toString().toUpperCase() : 'DESC';
+      const orderDirection = validDirections.includes(direction?.toString().toUpperCase() || 'DESC') ? direction?.toString().toUpperCase() : 'DESC';
 
       const query = this.orderRepository
         .createQueryBuilder('order')
@@ -188,9 +178,9 @@ export class OrderController {
       } else if (endDate) {
         query.andWhere('order.dateRequest <= :endDate', { endDate });
       }
-
+    
+  
       query.orderBy(`order.${orderField}`, orderDirection);
-
       const total = await query.getCount();
 
       const rentals = await query
@@ -199,9 +189,9 @@ export class OrderController {
         .getMany();
 
       if (rentals.length === 0) {
-        return res.status(200).json({
+        res.status(200).json({
           status: 'success',
-          message: "Nenhum pedido de aluguel encontrado.",
+          message: "No rental applications found.",
           data: [],
           pagination: {
             total,
@@ -217,7 +207,7 @@ export class OrderController {
         rental.totalValue = Number(rental.totalValue);
       });
 
-      return res.status(200).json({
+      res.status(200).json({
         status: 'success',
         data: rentals,
         pagination: {
@@ -228,111 +218,102 @@ export class OrderController {
         },
       });
     } catch (error) {
-      console.error(error);
       if (error instanceof AppError) {
-        return res.status(error.statusCode).json({ 
+        res.status(error.statusCode).json({ 
           status: 'error', 
           message: error.message 
         });
       }
-      return res.status(500).json({ 
-        status: 'error', 
-        message: 'Erro ao listar os pedidos de aluguel.', 
-        error: error.message 
-      });
+      throw new AppError(`Server error ${error}`,  400)
+      
     }
   }
   
   
-  public async update(req: Request, res: Response): Promise<Response> {
+  public async update(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
   
       const order = await this.orderRepository.findOne({ where: { id }, relations: ['car'] });
       if (!order) {
-        throw new AppError("Pedido não encontrado", 404);
+        res.status(404).json({ message: "Order was not found" });
+        return; 
       }
   
       const { cep, startDate, endDate, statusRequest } = req.body;
-      console.log("Dados recebidos no req.body:");
-      console.log("startDate:", startDate);
-      console.log("endDate:", endDate);
   
-      // Definir o formato da data para 'dd/MM/yyyy'
       const dateFormat = 'dd/MM/yyyy';
   
-      // Validação de datas usando date-fns
+      
       if (startDate) {
-        console.log("startDate recebida:", startDate);
         const start = parse(startDate, dateFormat, new Date());
-        console.log("Data inicial após parse:", start);
   
         if (isNaN(start.getTime())) {
-          throw new AppError("Data inicial inválida", 400);
+          res.status(400).json({ message: "Start date is invalid" });
+          return;
         }
   
         if (isBefore(start, new Date())) {
-          throw new AppError("Data inicial não pode ser menor que a data atual", 400);
+          res.status(400).json({ message: "Start date cannot be earlier than now" });
+          return;
         }
   
         order.startDate = start;
-        console.log("order.startDate após atribuição:", order.startDate);
       }
   
+      
       if (endDate) {
-        console.log("endDate recebida:", endDate);
         const end = parse(endDate, dateFormat, new Date());
-        console.log("Data final após parse:", end);
   
         if (isNaN(end.getTime())) {
-          throw new AppError("Data final inválida", 400);
+          res.status(400).json({ message: "End date is invalid" });
+          return;
         }
   
         if (isBefore(end, order.startDate || new Date())) {
-          throw new AppError("Data final não pode ser menor que a data inicial", 400);
+          res.status(400).json({ message: "End date should be later than start date" });
+          return;
         }
   
         order.endDate = end;
-        console.log("order.endDate após atribuição:", order.endDate);
       }
   
+   
       if (cep) {
         const cep_cliente = cep.toString().trim().replace('-', '');
   
         if (cep_cliente.length !== 8) {
-          throw new AppError("CEP deve ter 8 dígitos", 400);
+          res.status(400).json({ message: "CEP must have 8 digits" });
+          return;
         }
   
         const data = await getData(cep_cliente);
         if (!data) {
-          throw new AppError("CEP não encontrado", 404);
+          res.status(404).json({ message: "CEP was not found" });
+          return;
         }
-        console.log("Dados do CEP:", data);
   
         const uf = data.uf;
-        let valorFrete = fretePorUF[uf];
-  
-        if (valorFrete === undefined) {
-          valorFrete = 170.00;
-        }
+        const rentalTax = fretePorUF[uf] ?? 170.00;
   
         order.cep = data.cep;
         order.city = data.localidade;
         order.uf = uf;
-        order.rentalTax = valorFrete;
+        order.rentalTax = rentalTax;
       }
   
-     
       if (statusRequest) {
         const status = statusRequest.toLowerCase();
   
-        if (status !== "aprovado" && status !== "fechado" && status !== "cancelado") {
-          throw new AppError("Status inválido", 400);
+        if (!['approved', 'closed', 'cancelled'].includes(status)) {
+          res.status(400).json({ message: "Status is not valid" });
+          return;
         }
   
-        if (status === "aprovado") {
-          if (order.statusRequest !== "aberto") {
-            throw new AppError("Apenas pedidos abertos podem ser aprovados", 400);
+        if (status === 'approved') {
+          if (order.statusRequest !== 'open') {
+            res.status(400).json({ message: "Only open orders can be approved" });
+            return;
           }
   
           if (
@@ -343,67 +324,60 @@ export class OrderController {
             !order.uf ||
             order.rentalTax === undefined
           ) {
-            throw new AppError("Todos os campos devem estar preenchidos para aprovar o pedido", 400);
+            res.status(400).json({ message: "All values must be provided" });
+            return;
           }
   
-          order.statusRequest = "aprovado";
-        } else if (status === "cancelado") {
-          if (order.statusRequest !== "aberto") {
-            throw new AppError("Apenas pedidos abertos podem ser cancelados", 400);
+          order.statusRequest = 'approved';
+        } else if (status === 'cancelled') {
+          if (order.statusRequest !== 'open') {
+            res.status(400).json({ message: "Only open orders can be cancelled" });
+            return;
           }
   
-          order.statusRequest = "cancelado";
+          order.statusRequest = 'cancelled';
           order.cancelDate = new Date();
-        } else if (status === "fechado") {
-          if (order.statusRequest !== "aprovado") {
-            throw new AppError("Apenas pedidos aprovados podem ser fechados", 400);
+        } else if (status === 'closed') {
+          if (order.statusRequest !== 'approved') {
+            res.status(400).json({ message: "Only approved orders can be closed" });
+            return;
           }
   
           const today = new Date();
           const end = order.endDate || today;
   
           if (isBefore(end, today)) {
-            const diasUltrapassados = differenceInDays(today, end);
+            const dayOver = differenceInDays(today, end);
             const dailyRate = Number(order.car.daily_price) || 0;
   
-            order.fine = dailyRate * 2 * diasUltrapassados;
+            order.fine = dailyRate * 2 * dayOver;
           }
   
-          order.statusRequest = "fechado";
+          order.statusRequest = 'closed';
           order.finishDate = today;
         }
       }
   
-      
       if (order.startDate && order.endDate) {
-        const rentalDays = differenceInDays(order.endDate, order.startDate) || 1; // Pelo menos 1 dia
+        const rentalDays = differenceInDays(order.endDate, order.startDate) || 1; 
         const dailyRate = Number(order.car.daily_price) || 0;
         const totalDailyRate = rentalDays * dailyRate;
   
         order.totalValue = totalDailyRate + (order.rentalTax || 0) + (order.fine || 0);
       }
   
-      console.log("Estado do order antes de salvar:", order);
-  
       await this.orderRepository.save(order);
   
-      console.log("Estado do order após salvar:", order);
-  
-      return res.status(200).json({
+      res.status(200).json({
         status: 'success',
         data: order,
       });
     } catch (error) {
-      console.error(error);
-      if (error instanceof AppError) {
-        return res.status(error.statusCode).json({ status: 'error', message: error.message });
-      }
-      return res.status(500).json({ status: 'error', message: "Internal Server Error" });
+      throw new AppError(`Server error ${error}`,  400)
     }
   }
-  
 
-  async cancelOrder(req: Request, res: Response): Promise<Response> {
+  async cancelOrder(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
 
@@ -411,28 +385,23 @@ export class OrderController {
         where: { id },
         relations: ['customer', 'car'],
       });
-
-      // Verificar se o pedido existe
+      
+     
       if (!order) {
-        return res.status(404).json({ 
-          status: 'error', 
-          message: 'Pedido de aluguel não encontrado.' 
-        });
+        throw new AppError("Order request was not found", 400)
+       
       }
 
-      if (order.statusRequest !== 'aberto') { 
-        return res.status(400).json({ 
-          status: 'error', 
-          message: 'Apenas pedidos com status "aberto" podem ser cancelados.' 
-        });
+      if (order.statusRequest !== 'open') { 
+          throw new AppError("Only open orders can be cancelled", 400)
       }
 
-      order.statusRequest = 'cancelado';
+      order.statusRequest = 'cancelled';
       await this.orderRepository.save(order);
 
-      return res.status(200).json({
+      res.status(200).json({
         status: 'success',
-        message: 'Pedido de aluguel cancelado com sucesso.',
+        message: 'Order was cancelled.',
         data: {
           id: order.id,
           statusRequest: order.statusRequest,
@@ -453,18 +422,10 @@ export class OrderController {
       });
 
     } catch (error) {
-      console.error(error);
       if (error instanceof AppError) {
-        return res.status(error.statusCode).json({ 
-          status: 'error', 
-          message: error.message 
-        });
+        throw new AppError(`Server error ${error}`,  400)
       }
-      return res.status(500).json({ 
-        status: 'error', 
-        message: 'Erro ao cancelar o pedido de aluguel.', 
-        error: error.message 
-      });
+     
     }
   }
   
