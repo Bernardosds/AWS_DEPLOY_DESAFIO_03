@@ -50,9 +50,6 @@ export class CarsController {
       const id = req.params.id.trim();
 
       const car = await this.showCarService.findCarById(id);
-      if (car.items) {
-        car.items = JSON.parse(car.items);
-      }
 
       res.status(200).json(car);
     } catch (error) {
