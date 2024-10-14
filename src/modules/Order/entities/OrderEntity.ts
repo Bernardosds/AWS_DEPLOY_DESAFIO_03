@@ -7,6 +7,7 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
+
 import IOrder from './IOrder';
 import Customer from '../../customers/entities/Customer';
 import Cars from '../../cars/entities/Cars';
@@ -46,12 +47,12 @@ export default class Order implements IOrder {
   endDate!: Date | null;
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
-  cancelDate!: Date;
+  cancelDate!: Date | null;
 
   @CreateDateColumn({ type: 'timestamp', nullable: true })
-  finishDate!: Date;
+  finishDate!: Date | null;
 
-  @Column()
+  @Column({ type: 'decimal', default: 0 })
   fine!: number;
 
   @OneToOne(() => Customer, customer => customer.order, {nullable: false})

@@ -6,7 +6,7 @@ export default interface IOrder {
   dateRequest?: Date;
   statusRequest?: string;
   cep?: string | null;
-  cidade?: string | null;
+  city?: string | null;
   uf?: string | null;
   rentalTax?: number;       
   totalValue?: number;      
