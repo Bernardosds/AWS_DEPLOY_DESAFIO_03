@@ -3,6 +3,7 @@ import AppDataSource from '../../../db/data-source';
 import IFilter from '../interface/IFilter';
 import ICarsResponse from '../interface/ICarsResponse';
 import { listCarValidator } from './validators';
+import CarStatus from '../interface/CarStatus';
 
 class ListCarsService {
   private carsRepository = AppDataSource.getRepository(Cars);
@@ -18,6 +19,8 @@ class ListCarsService {
 
     if (filters.status) {
       queryBuilder.andWhere('car.status = :status', { status: filters.status });
+    } else {
+      queryBuilder.andWhere('car.status != :status', { status: CarStatus.Deleted });
     }
 
     if (filters.plateEnd) {
@@ -63,8 +66,8 @@ class ListCarsService {
     }
 
     if (filters.items) {
-      queryBuilder.andWhere('car.items LIKE :items', {
-        items: `%${filters.items}%`,
+      queryBuilder.andWhere('car.items = :items', {
+        items: JSON.stringify(filters.items),
       });
     }
 
@@ -80,19 +83,19 @@ class ListCarsService {
     }
 
     const page = filters.page || 1;
-    const size = filters.size || 10;
+    const limit = filters.limit || 10;
 
-    queryBuilder.skip((page - 1) * size).take(size);
+    queryBuilder.skip((page - 1) * limit).take(limit);
 
-    queryBuilder.skip((page - 1) * size).take(size);
+    queryBuilder.skip((page - 1) * limit).take(limit);
 
     const [cars, totalCount] = await queryBuilder.getManyAndCount();
 
     return {
-      data: cars,
       totalCount,
-      totalPages: Math.ceil(totalCount / size),
+      totalPages: Math.ceil(totalCount / limit),
       currentPage: page,
+      cars: cars,
     };
   };
 }

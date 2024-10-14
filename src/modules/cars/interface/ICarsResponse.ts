@@ -1,7 +1,7 @@
 import Cars from '../entities/Cars';
 
 export default interface ICarsResponse {
-  data: Cars[];
+  cars: Cars[];
   totalCount: number;
   totalPages: number;
   currentPage: number;
