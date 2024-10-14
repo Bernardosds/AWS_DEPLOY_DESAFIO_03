@@ -8,8 +8,8 @@ import {
 } from 'typeorm';
 
 import ICustomer from '../interface/ICustomer'; 
+import Order from '../../Order/entities/OrderEntity';
 
-import RentalRequest from '../../rental_requests/entities/rental_request'
 @Entity('customers')
 class Customer implements ICustomer{
   @PrimaryGeneratedColumn('uuid')
@@ -36,10 +36,8 @@ class Customer implements ICustomer{
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt?: Date;
 
-
-  @OneToOne(() => RentalRequest, (rentalRequest) => rentalRequest.cars)
-  rentalRequest!: RentalRequest
+  @OneToOne(() => Order, (order) => order.customer)
+  order!: Order
 }
-  
 
 export default Customer;

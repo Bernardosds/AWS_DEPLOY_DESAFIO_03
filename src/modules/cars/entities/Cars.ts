@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
 import CarStatus from '../interface/CarStatus';
-import RentalRequest from '../../rental_requests/entities/rental_request';
+import Order from '../../Order/entities/OrderEntity';
+
 @Entity('cars')
 class Cars {
   @PrimaryGeneratedColumn('uuid')
@@ -33,8 +34,8 @@ class Cars {
   })
   status?: CarStatus;
 
-  @OneToOne(() => RentalRequest, rentalRequest => rentalRequest.cars)
-  rentalRequest!: RentalRequest;
+  @OneToOne(() => Order, order => order.car)
+  order!: Order;
 
   @Column('datetime', { nullable: false, default: () => 'CURRENT_TIMESTAMP' })
   registration_date?: Date;

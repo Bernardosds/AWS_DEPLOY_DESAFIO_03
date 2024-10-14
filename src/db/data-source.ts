@@ -1,13 +1,9 @@
 import 'reflect-metadata';
-<<<<<<< HEAD
-import { DataSource } from 'typeorm';
-=======
 
 import { DataSource } from 'typeorm';
 import Customer from '../modules/customers/entities/Customer';
 import User from '../modules/users/entities/User'
-import RentalRequest from '../modules/rental_requests/entities/rental_request';
->>>>>>> f1e142729cbb38a0d38a10cb7ddf1c8c10b9518d
+import Order from '../modules/Order/entities/OrderEntity';
 import Cars from '../modules/cars/entities/Cars';
 
 import dotenv from 'dotenv';
@@ -22,13 +18,9 @@ const AppDataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  synchronize: true,
-  // logging: true,
-<<<<<<< HEAD
-  entities: [Cars],
-=======
-  entities: [Customer, User, RentalRequest, Cars],
->>>>>>> f1e142729cbb38a0d38a10cb7ddf1c8c10b9518d
+  synchronize: false,
+  logging: true,
+  entities: [Customer, User, Order, Cars],
   migrations: ['src/db/migration/*.ts'],
   subscribers: [],
 });

@@ -2,13 +2,12 @@ import 'reflect-metadata';
 import express from 'express';
 import 'express-async-errors';
 import cors from 'cors';
-import { AppDataSource } from './db/DataSource';
-import userRouter from './modules/users/routes/UsersRoutes';
+import AppDataSource from './db/data-source';
 import { errors } from 'celebrate';
 import AppError from './shared/errors/AppError';
-import loginRouter from './modules/users/routes/LoginRoutes';
+//import rentalRouter from './modules/rental_requests/routes/routes.rental.request';
 import { Request, Response, NextFunction } from 'express';
-import { authMiddleware } from './shared/middlewares/verifyauth';
+import routes from './shared/routes/routes';
 
 const app = express();
 
@@ -16,10 +15,12 @@ app.use(cors());
 
 app.use(express.json());
 
-app.use(authMiddleware);
+//app.use('/login', loginRouter);
 
-app.use('/users', userRouter);
-app.use('/login', loginRouter);
+//app.use('/users',authMiddleware, userRouter);
+
+app.use('/', routes)
+
 
 app.use(errors());
 

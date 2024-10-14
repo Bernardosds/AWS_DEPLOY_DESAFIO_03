@@ -1,13 +1,21 @@
 import { Router } from 'express';
 import { CarsController } from '../controllers/CarsController';
+import CarsService from '../services';
 
-const routes = Router();
-const carsController = new CarsController();
+const carRoutes = Router();
 
-routes.post('/cars', carsController.create);
-routes.get('/cars', carsController.list);
-routes.get('/cars/:id', carsController.getById.bind(carsController));
-routes.patch('/cars/:id', carsController.updateCar);
-routes.delete('/cars/:id', carsController.deleteCar);
+const carsController = new CarsController(
+  new CarsService.CreateCarService(),
+  new CarsService.ListCarsService(),
+  new CarsService.ShowCarService(),
+  new CarsService.UpdateCarService(),
+  new CarsService.DeleteCarService(),
+);
 
-export default routes;
+carRoutes.post('/create', carsController.create);
+carRoutes.get('/', carsController.list);
+carRoutes.get('/:id', carsController.getById.bind(carsController));
+carRoutes.patch('/update/:id', carsController.updateCar);
+carRoutes.delete('/delete/:id', carsController.deleteCar);
+
+export default carRoutes;

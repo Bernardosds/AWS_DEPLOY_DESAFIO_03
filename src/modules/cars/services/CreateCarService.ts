@@ -1,7 +1,7 @@
 import Cars from '../entities/Cars';
 import AppDataSource from '../../../db/data-source';
 import ICars from '../interface/ICars';
-import { formatPlate } from './formatters';
+import { formatPlate} from './formatters';
 import CarStatus from '../interface/CarStatus';
 class CreateCarService {
   createCar = async (carData: ICars): Promise<Cars> => {

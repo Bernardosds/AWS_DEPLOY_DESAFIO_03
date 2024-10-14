@@ -7,10 +7,12 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import IRentalRequestEntity from '../interfaces/IRentalRequestEntity';
+import IOrder from './IOrder';
+import Customer from '../../customers/entities/Customer';
 import Cars from '../../cars/entities/Cars';
-@Entity('rental_requests')
-export default class RentalRequest implements IRentalRequestEntity {
+
+@Entity('Order')
+export default class Order implements IOrder {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -18,8 +20,7 @@ export default class RentalRequest implements IRentalRequestEntity {
   dateRequest!: Date;
 
   @Column('enum', {
-    enum: ['active', 'inactive', 'deleted'],
-    nullable: false,
+    enum: ['aberto', 'aprovado', 'fechado', 'cancelado']
   })
   statusRequest!: string;
 
@@ -27,7 +28,7 @@ export default class RentalRequest implements IRentalRequestEntity {
   cep!: string;
 
   @Column({ type: 'varchar', default: null })
-  cidade!: string;
+  city!: string;
 
   @Column({ type: 'varchar', default: null })
   uf!: string;
@@ -38,22 +39,26 @@ export default class RentalRequest implements IRentalRequestEntity {
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   totalValue!: number;
 
-  @CreateDateColumn({ type: 'timestamp', nullable: true, default: null })
-  startDate!: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  startDate!: Date | null;
 
-  @CreateDateColumn({ type: 'timestamp', nullable: true, default: null })
-  endDate!: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  endDate!: Date | null;
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   cancelDate!: Date;
 
   @CreateDateColumn({ type: 'timestamp', nullable: true })
-  finishData!: Date;
+  finishDate!: Date;
 
   @Column()
   fine!: number;
 
-  @OneToOne(() => Cars, cars => cars.rentalRequest)
+  @OneToOne(() => Customer, customer => customer.order, {nullable: false})
   @JoinColumn()
-  cars!: Cars;
+  customer!: Customer;
+
+  @OneToOne(() => Cars, cars => cars.order, {nullable: false})
+  @JoinColumn()
+  car!: Cars;
 }

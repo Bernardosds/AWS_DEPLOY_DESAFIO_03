@@ -5,11 +5,11 @@ import CreateUserService from '../services/CreateUserService';
 import UsersController from '../controllers/UsersController';
 import User from '../entities/User';
 import { celebrate, Joi, Segments } from 'celebrate';
-<<<<<<< Updated upstream
 import AppDataSource  from '../../../db/data-source';
-=======
-import AppDataSource from '../../../db/data-source'; 
->>>>>>> Stashed changes
+import ListUsersService from '../services/ListUsersService';
+import ShowUserService from '../services/ShowUserService';
+import DeleteUserService from '../services/DeleteUserService';
+import UpdateUserService from '../services/UpdateUserService';
 
 
 const userRouter = Router();
