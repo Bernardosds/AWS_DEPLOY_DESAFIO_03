@@ -14,6 +14,8 @@ servers:
 tags:
   - name: users
     description: Gerenciamento das informações sobre usuários do sistema
+  - name: login
+    description: Permite que usuários se autentiquem para ter acesso a API
   - name: clients
     description: Gerenciamento de clientes
   - name: cars
@@ -26,6 +28,8 @@ paths:
       tags:
         - users
       description: Criação de um novo usuário
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -56,9 +60,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
-                    example: "User created successfully."
                   userId:
                     type: string
                     format: uuid
@@ -72,7 +73,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "There is already a user registered with this email."
+                    example: "a user with this email address already exists"
         '400':
           description: Informações ausentes ou inválidas.
           content:
@@ -82,7 +83,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Incorrect or missing data."          
+                    example: "field is required"
     get:
       tags:
         - users
@@ -136,7 +137,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "User not found."
+                    example: {}
         '400':
           description: Parâmetros inválidos.
           content:
@@ -146,7 +147,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Invalid parameters."
+                    example: "invalid parameters / field is required."
   /users/{id}:
 
     get:
@@ -166,8 +167,10 @@ paths:
       responses:
         '200':
           description: Informações detalhadas do usuário.
-          schema:
-          $ref: '#/components/schemas/User'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '404':
           description: Usuário não encontrado.
           content:
@@ -177,7 +180,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "User not found."
+                    example: "user not found"
         '400':
           description: ID inválido.
           content:
@@ -187,8 +190,8 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Invalid ID."
-    put:
+                    example: "invalid id"
+    patch:
       tags:
         - users
       description: Atualizar informações de um usuário
@@ -222,9 +225,11 @@ paths:
                   description: Senha do usuário (criptografada)
       responses:
         '200':
-          description: Informações detalhadas do usuário atualizadas.
-          schema:
-          $ref: '#/components/schemas/User'
+          description: Informações do usuário atualizadas com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '404':
           description: Usuário não encontrado.
           content:
@@ -234,7 +239,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "User not found."
+                    example: "user not found"
         '400':
           description: ID inválido.
           content:
@@ -244,7 +249,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Invalid ID."
+                    example: "invalid id"
     delete:
       tags:
         - users
@@ -273,7 +278,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "User not found."
+                    example: "user not found"
         '400':
           description: Informações inválidas.
           content:
@@ -283,7 +288,58 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Invalid data."
+                    example: "invalid data"
+  /login:
+    post:
+      tags:
+        - login
+      description: Autenticação de usuário (login)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email do usuário
+                password:
+                  type: string
+                  format: password
+                  description: Senha do usuário
+      responses:
+        '200':
+          description: Login realizado com sucesso. Retorna o token de autenticação.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '400':
+          description: Dados inválidos ou ausentes.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "field is required / invalid field format"
+        '404':
+          description: Usuário não encontrado ou excluído.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "user not found"
   /cars/create:
     post:
       tags:
@@ -593,4 +649,4 @@ components:
         daily_price:
           type: number
           format: float
-          example: 99.99 
+          example: 99.99

@@ -13,7 +13,7 @@ export default class DeleteUserService implements IDeleteUserService {
         const user = await this.usersRepository.findById(id);
 
         if (!user) {
-            throw new AppError('user not found', 400);
+            throw new AppError('user not found', 404);
         }
 
         user.deletedAt = new Date();
