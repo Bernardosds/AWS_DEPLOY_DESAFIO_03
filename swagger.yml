@@ -505,6 +505,259 @@ paths:
           description: Car not found
         500:
           description: Internal server error
+    /customers:
+      post:
+        tags:
+          - customers
+        description: Criação de um novo cliente.
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fullName:
+                    type: string
+                    description: Nome completo do cliente
+                    example: "João da Silva"
+                  email:
+                    type: string
+                    format: email
+                    description: Email do cliente
+                    example: "joao.silva@example.com"
+                  birthDate:
+                    type: string
+                    format: date
+                    description: Data de nascimento do cliente
+                    example: "1990-01-01"
+                  cpf:
+                    type: string
+                    description: CPF do cliente
+                    example: "123.456.789-00"
+                  phone:
+                    type: string
+                    description: Telefone do cliente
+                    example: "(11) 98765-4321"
+    responses:
+        '201':
+          description: Cliente criado com sucesso, retorna o cliente criado.
+          content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  example: "426de8fc-6c54-4c99-ab3a-2fe6001c9ba6"
+          '400':
+            description: Informações inválidas.
+            content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Name must be letters and must be more than 3 letters"
+          '500':
+            description: Erro interno.
+            content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal Server Error"
+get:
+  tags:
+    - customers
+  description: Listagem de clientes com filtros e paginação.
+  security:
+  - bearerAuth: []
+parameters:
+  - name: fullName
+    in: query
+    description: Filtrar por parte do nome do cliente.
+    schema:
+    type: string
+  - name: email
+    in: query
+    description: Filtrar por parte do e-mail.
+    schema:
+    type: string
+  - name: cpf
+    in: query
+    description: Filtrar por parte do CPF do cliente.
+    schema:
+      type: string
+  - name: exclude
+    in: query
+    description: Filtrar por status de exclusão (sim/não).
+    schema:
+      type: boolean
+  - name: order
+    in: query
+    description: Campo de ordenação (nome, data de cadastro, data de exclusão).
+    schema:
+      type: string
+  - name: page
+    in: query
+    description: Página atual da lista.
+    schema:
+      type: integer
+  - name: pageSize
+    in: query
+    description: Tamanho da página.
+    schema:
+      type: integer
+responses:
+      '200':
+        description: Lista de clientes retornada com sucesso.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerList'
+      '204':
+        description: Nenhum cliente encontrado.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "No customers found"
+      '400':
+        description: Parâmetros inválidos.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Invalid parameters."
+patch: 
+  tags:
+    - customers
+  description: Atualizar informações de um cliente
+  security:
+    - bearerAuth: []
+  parameters:
+      - name: id
+        in: path
+        description: ID do cliente
+        required: true
+        schema:
+          type: string
+          format: uuid
+  requestBody:
+    required: true
+    content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          fullName:
+            type: string
+            description: Nome completo do cliente
+          email:
+            type: string
+            format: email
+            description: Email do cliente
+          birthDate:
+            type: string
+            format: date
+            description: Data de nascimento do cliente
+          cpf:
+            type: string
+            description: CPF do cliente
+          phone:
+            type: string
+            description: Telefone do cliente
+    responses:
+      '200':
+        description: Informações de um cliente
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Customer updated"
+        '400':
+          description:  Informações inválidas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Send a valid CPF"            
+        '404':
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Customer not found"
+        '500':
+          description: Erro interno
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal Server Error"              
+      delete:
+          tags:
+            - customers
+          description: Soft delete de um cliente (marcar como excluído)
+          security:
+            - bearerAuth: []
+          parameters:
+            - name: id
+              in: path
+              description: ID do cliente
+              required: true
+              schema:
+                type: string
+                format: uuid
+      responses:
+        '204':
+          description: Cliente deletado com sucesso.
+          content:
+          {}
+        '404':
+        description: Cliente não encontrado.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Customer not found"
+        '400':
+          description: Informações inválidas.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Valid ID is required"  
 components:
   schemas:
     User:
@@ -650,3 +903,52 @@ components:
           type: number
           format: float
           example: 99.99
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "426de8fc-6c54-4c99-ab3a-2fe6001c9ba6"
+        fullName:
+          type: string
+          example: "João da Silva"
+        email:
+          type: string
+          format: email
+          example: "joao.silva@example.com"
+        birthDate:
+          type: string
+          format: date
+          example: "1990-01-01"
+        cpf:
+          type: string
+          example: "123.456.789-00"
+        phone:
+          type: string
+          example: "(11) 98765-4321"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-10-01T12:00:00Z"
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+    CustomerList:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 2
+        totalPages:
+          type: integer
+          example: 1
+        currentPage:
+          type: integer
+          example: 1
+        customers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
