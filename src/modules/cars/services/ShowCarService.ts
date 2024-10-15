@@ -1,5 +1,6 @@
 import Cars from '../entities/Cars';
 import AppDataSource from '../../../db/data-source';
+import AppError from '../../../shared/errors/AppError';
 
 class ShowCarService {
   findCarById = async (id: string) => {
@@ -8,7 +9,7 @@ class ShowCarService {
     const car = await carsRepository.findOneBy({ id });
 
     if (!car) {
-      throw new Error('Car not found');
+      throw new AppError('Car not found', 404);
     }
 
     car.items = JSON.parse(car.items!);

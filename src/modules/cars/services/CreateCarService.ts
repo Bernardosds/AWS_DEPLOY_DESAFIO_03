@@ -1,8 +1,10 @@
 import Cars from '../entities/Cars';
 import AppDataSource from '../../../db/data-source';
 import ICars from '../interface/ICars';
-import { formatPlate} from './formatters';
+import { formatPlate } from './formatters';
 import CarStatus from '../interface/CarStatus';
+import AppError from '../../../shared/errors/AppError';
+
 class CreateCarService {
   createCar = async (carData: ICars): Promise<Cars> => {
     const carsRepository = AppDataSource.getRepository(Cars);
@@ -27,7 +29,7 @@ class CreateCarService {
     });
 
     if (existingCar && existingCar.status !== CarStatus.Deleted) {
-      throw new Error('This car is already registrated!');
+      throw new AppError('This car is already registrated!', 409);
     }
 
     await carsRepository.save(newCar);

@@ -5,6 +5,7 @@ import ICars from '../interface/ICars';
 import { createCarValidator, updateCarValidator } from '../services/validators';
 import CarsService from '../services';
 import Joi from 'joi';
+import AppError from '../../../shared/errors/AppError';
 
 export class CarsController {
   constructor(
@@ -40,8 +41,11 @@ export class CarsController {
 
       res.status(201).json(newCar);
     } catch (error) {
-      const typedError = error as Error;
-      res.status(400).json({ message: typedError.message });
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: 'Internal Server Error' });
     }
   };
 
@@ -53,8 +57,11 @@ export class CarsController {
 
       res.status(200).json(car);
     } catch (error) {
-      const typedError = error as Error;
-      res.status(400).json({ message: typedError.message });
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: 'Internal Server Error' });
     }
   };
 
@@ -70,14 +77,14 @@ export class CarsController {
           }
         });
       } else {
-        throw new Error('Car not found');
+        throw new AppError('Car not found', 404);
       }
       res.status(200).json(carsResponse);
     } catch (error) {
       if (error instanceof Joi.ValidationError) {
         res.status(400).json({ message: error.message });
-      } else if (error instanceof Error) {
-        res.status(500).json({ message: error.message });
+      } else if (error instanceof AppError) {
+        res.status(error.statusCode).json({ message: error.message });
       } else {
         res.status(500).json({ message: 'Internal server error' });
       }
@@ -105,8 +112,11 @@ export class CarsController {
 
       res.status(201).json(updatedCar);
     } catch (error) {
-      const typedError = error as Error;
-      res.status(400).json({ message: typedError.message });
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: 'Internal Server Error' });
     }
   };
 
@@ -118,15 +128,12 @@ export class CarsController {
 
       res.status(200).json({ message: 'Car deleted successfully' });
     } catch (error) {
-      const typedError = error as Error;
-      if (
-        typedError.message === 'Car not found!' ||
-        typedError.message === 'This car is already deleted!'
-      ) {
-        res.status(404).json({ message: typedError.message });
-      } else {
-        res.status(500).json({ message: 'Internal server error' });
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({ message: error.message });
+        return;
       }
+      console.log(error);
+      res.status(500).json({ message: 'Internal Server Error' });
     }
   };
 }

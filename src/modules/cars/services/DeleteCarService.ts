@@ -2,6 +2,7 @@ import Cars from '../entities/Cars';
 import AppDataSource from '../../../db/data-source';
 import CarStatus from '../interface/CarStatus';
 import Order from '../../Order/entities/OrderEntity';
+import AppError from '../../../shared/errors/AppError';
 
 class DeleteCarService {
   deleteCar = async (id: string): Promise<void> => {
@@ -11,19 +12,23 @@ class DeleteCarService {
     const car = await carsRepository.findOneBy({ id });
 
     if (!car) {
-      throw new Error('Car not found!');
+      throw new AppError('Car not found!', 404);
     }
     if (car.status == CarStatus.Deleted) {
-      throw new Error('This car is already deleted!');
+      throw new AppError('This car is already deleted!', 409);
     }
 
-    const order = await orderRepository.findOneBy({ id });
+    const order = await orderRepository.findOne({
+      where: { id },
+      select: ['statusRequest'],
+    });
 
     if (order) {
       const statusRequest = order.statusRequest;
-      if (statusRequest !== 'canceled' && statusRequest !== 'closed') {
-        throw new Error(
+      if (statusRequest !== 'cancelled' && statusRequest !== 'closed') {
+        throw new AppError(
           "This car can't be deleted due to outstanding issues or open orders",
+          409,
         );
       }
     }

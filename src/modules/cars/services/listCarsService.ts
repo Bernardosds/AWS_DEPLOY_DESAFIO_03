@@ -20,7 +20,9 @@ class ListCarsService {
     if (filters.status) {
       queryBuilder.andWhere('car.status = :status', { status: filters.status });
     } else {
-      queryBuilder.andWhere('car.status != :status', { status: CarStatus.Deleted });
+      queryBuilder.andWhere('car.status != :status', {
+        status: CarStatus.Deleted,
+      });
     }
 
     if (filters.plateEnd) {

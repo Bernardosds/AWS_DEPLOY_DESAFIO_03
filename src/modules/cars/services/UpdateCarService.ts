@@ -2,6 +2,7 @@ import Cars from '../entities/Cars';
 import AppDataSource from '../../../db/data-source';
 import ICars from '../interface/ICars';
 import { formatPlate } from './formatters';
+import AppError from '../../../shared/errors/AppError';
 
 class UpdateCarService {
   updateCar = async (id: string, updates: Partial<ICars>) => {
@@ -9,7 +10,7 @@ class UpdateCarService {
     const car = await carsRepository.findOneBy({ id });
 
     if (!car) {
-      throw new Error('Car not found');
+      throw new AppError('Car not found', 404);
     }
 
     const updateFields = [
