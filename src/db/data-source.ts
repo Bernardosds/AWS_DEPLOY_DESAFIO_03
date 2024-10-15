@@ -2,7 +2,7 @@ import 'reflect-metadata';
 
 import { DataSource } from 'typeorm';
 import Customer from '../modules/customers/entities/Customer';
-import User from '../modules/users/entities/User'
+import User from '../modules/users/entities/User';
 import Order from '../modules/Order/entities/OrderEntity';
 import Cars from '../modules/cars/entities/Cars';
 
@@ -19,7 +19,7 @@ const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   synchronize: false,
-  logging: true,
+  logging: false,
   entities: [Customer, User, Order, Cars],
   migrations: ['src/db/migration/*.ts'],
   subscribers: [],
