@@ -12,9 +12,19 @@
     "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Bernardo Silveira <bernardosdev@gmail.com>, Maria Carolina Gonçalves da Silva <goncalves.macarolina@gmail.com>, Ricardo Amorim Pini de Almeida <ricardo.contato14@outlook.com>, Saulo Adones Gabriel Guimaraes da Silveira <sauloadonesg@gmail.com>, Wagner Suzano Urivi <wagnersuzano2@gmail.com>",
+  "contributors": [
+    {
+      "name": "Hyury Freitas Gomes",
+      "email": "hyuryrs12@gmail.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bernardosds/AWS_NODE_AGO24_DESAFIO_02_CORINGA"
+  },
   "license": "ISC",
-  "description": "",
+  "description": "API for Car Rental Management: This API facilitates the management of car rentals. It allows for user management, customer registration, control of available cars for rent, and the creation and tracking of rental orders.",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "celebrate": "^15.0.3",
