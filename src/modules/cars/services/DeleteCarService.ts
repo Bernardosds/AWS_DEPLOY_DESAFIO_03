@@ -6,7 +6,7 @@ import Order from '../../Order/entities/OrderEntity';
 class DeleteCarService {
   deleteCar = async (id: string): Promise<void> => {
     const carsRepository = AppDataSource.getRepository(Cars);
-    const orderRepository = AppDataSource.getRepository(Order)
+    const orderRepository = AppDataSource.getRepository(Order);
 
     const car = await carsRepository.findOneBy({ id });
 
@@ -18,14 +18,16 @@ class DeleteCarService {
     }
 
     const order = await orderRepository.findOneBy({ id });
-    console.log(order);
-    if(order){
-      const statusRequest = order.statusRequest
-      if (statusRequest !== "cancelado" && statusRequest !== "fechado") {
-        throw new Error('This car can\'t be deleted due to outstanding issues or open orders');
+
+    if (order) {
+      const statusRequest = order.statusRequest;
+      if (statusRequest !== 'canceled' && statusRequest !== 'closed') {
+        throw new Error(
+          "This car can't be deleted due to outstanding issues or open orders",
+        );
       }
     }
-    
+
     car.status = CarStatus.Deleted;
 
     await carsRepository.save(car);

@@ -118,7 +118,6 @@ export class CarsController {
 
       res.status(200).json({ message: 'Car deleted successfully' });
     } catch (error) {
-      console.log(error);
       const typedError = error as Error;
       if (
         typedError.message === 'Car not found!' ||
