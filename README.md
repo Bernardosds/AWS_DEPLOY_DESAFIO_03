@@ -101,7 +101,7 @@ GET users?name=John&email=john.doe@example.com&excluded=false&sort=name&page=1&p
   "total": "integer",
   "totalPages": "integer",
   "currentPage": "integer",
-  "users": [ /* lista de usuários */ ]
+  "users": [ "/lista de usuários/" ]
 }
 ```
 ### GET users/:{id}
