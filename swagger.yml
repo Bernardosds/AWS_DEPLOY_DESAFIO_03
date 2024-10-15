@@ -16,7 +16,7 @@ tags:
     description: Gerenciamento das informações sobre usuários do sistema
   - name: login
     description: Permite que usuários se autentiquem para ter acesso a API
-  - name: clients
+  - name: customers
     description: Gerenciamento de clientes
   - name: cars
     description: Gerenciamento de carros disponíveis para locação
@@ -28,8 +28,6 @@ paths:
       tags:
         - users
       description: Criação de um novo usuário
-      security:
-        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -88,8 +86,6 @@ paths:
       tags:
         - users
       description: Listagem de usuários com filtros e paginação
-      security:
-        - bearerAuth: []
       parameters:
         - name: name
           in: query
@@ -153,8 +149,6 @@ paths:
       tags:
         - users
       description: Busca um usuário por ID
-      security:
-        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -194,8 +188,6 @@ paths:
       tags:
         - users
       description: Atualizar informações de um usuário
-      security:
-        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -253,8 +245,6 @@ paths:
       tags:
         - users
       description: Soft delete de um usuário (marcar como excluído)
-      security:
-        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -338,168 +328,6 @@ paths:
                   message:
                     type: string
                     example: 'user not found'
-  /cars:
-    post:
-      tags:
-        - Cars
-      summary: Create a new car
-      requestBody:
-        description: Car object to create
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CarCreate'
-      responses:
-        201:
-          description: Car created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Car'
-        400:
-          description: Validation error
-    get:
-      tags:
-        - Cars
-      summary: List all cars
-      parameters:
-        - name: status
-          in: query
-          schema:
-            type: string
-            enum: [active, inactive, deleted]
-          description: Filter by car status
-        - name: plateEnd
-          in: query
-          schema:
-            type: string
-          description: Filter by the last characters of the plate
-        - name: brand
-          in: query
-          schema:
-            type: string
-          description: Filter by brand
-        - name: model
-          in: query
-          schema:
-            type: string
-          description: Filter by model
-        - name: mileage
-          in: query
-          schema:
-            type: integer
-          description: Filter by mileage
-        - name: yearFrom
-          in: query
-          schema:
-            type: integer
-          description: Filter by minimum year
-        - name: yearTo
-          in: query
-          schema:
-            type: integer
-          description: Filter by maximum year
-        - name: dailyPriceMin
-          in: query
-          schema:
-            type: number
-          description: Filter by minimum daily price
-        - name: dailyPriceMax
-          in: query
-          schema:
-            type: number
-          description: Filter by maximum daily price
-        - name: items
-          in: query
-          schema:
-            type: string
-          description: Filter by items (comma-separated values)
-      responses:
-        200:
-          description: A list of cars
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  totalCount:
-                    type: integer
-                  totalPages:
-                    type: integer
-                  currentPage:
-                    type: integer
-                  cars:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Car'
-        400:
-          description: Validation error
-  /cars/{id}:
-    get:
-      tags:
-        - Cars
-      summary: Get car by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: Car found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Car'
-        404:
-          description: Car not found
-    patch:
-      tags:
-        - Cars
-      summary: Update car details
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        description: Car object with updated data
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CarUpdate'
-      responses:
-        200:
-          description: Car updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Car'
-        400:
-          description: Validation error
-        404:
-          description: Car not found
-    delete:
-      tags:
-        - Cars
-      summary: Delete car by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: Car deleted successfully
-        404:
-          description: Car not found
-        500:
-          description: Internal server error
   /customers:
     post:
       tags:
@@ -570,8 +398,6 @@ paths:
       tags:
         - customers
       description: Listagem de clientes com filtros e paginação.
-      security:
-        - bearerAuth: []
       parameters:
         - name: fullName
           in: query
@@ -640,8 +466,6 @@ paths:
       tags:
         - customers
       description: Atualizar informações de um cliente.
-      security:
-        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -719,8 +543,6 @@ paths:
       tags:
         - customers
       description: Soft delete de um cliente (marcar como excluído).
-      security:
-        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -753,6 +575,267 @@ paths:
                   message:
                     type: string
                     example: 'Valid ID is required'
+  /cars:
+    post:
+      tags:
+        - cars
+      summary: Create a new car
+      requestBody:
+        description: Car object to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarCreate'
+      responses:
+        201:
+          description: Car created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Car'
+        400:
+          description: Validation error
+    get:
+      tags:
+        - cars
+      summary: List all cars
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, deleted]
+          description: Filter by car status
+        - name: plateEnd
+          in: query
+          schema:
+            type: string
+          description: Filter by the last characters of the plate
+        - name: brand
+          in: query
+          schema:
+            type: string
+          description: Filter by brand
+        - name: model
+          in: query
+          schema:
+            type: string
+          description: Filter by model
+        - name: mileage
+          in: query
+          schema:
+            type: integer
+          description: Filter by mileage
+        - name: yearFrom
+          in: query
+          schema:
+            type: integer
+          description: Filter by minimum year
+        - name: yearTo
+          in: query
+          schema:
+            type: integer
+          description: Filter by maximum year
+        - name: dailyPriceMin
+          in: query
+          schema:
+            type: number
+          description: Filter by minimum daily price
+        - name: dailyPriceMax
+          in: query
+          schema:
+            type: number
+          description: Filter by maximum daily price
+        - name: items
+          in: query
+          schema:
+            type: string
+          description: Filter by items (comma-separated values)
+      responses:
+        200:
+          description: A list of cars
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  currentPage:
+                    type: integer
+                  cars:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Car'
+        400:
+          description: Validation error
+  /cars/{id}:
+    get:
+      tags:
+        - cars
+      summary: Get car by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Car found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Car'
+        404:
+          description: Car not found
+    patch:
+      tags:
+        - cars
+      summary: Update car details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Car object with updated data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarUpdate'
+      responses:
+        200:
+          description: Car updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Car'
+        400:
+          description: Validation error
+        404:
+          description: Car not found
+    delete:
+      tags:
+        - cars
+      summary: Delete car by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Car deleted successfully
+        404:
+          description: Car not found
+        500:
+          description: Internal server error
+  /orders:
+    post:
+      tags:
+        - orders
+      summary: Criação de um novo pedido de locação
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cpf_cliente:
+                  type: string
+                  description: CPF do cliente
+                plate:
+                  type: string
+                  description: Placa do carro
+      responses:
+        '201':
+          description: Pedido criado com sucesso
+        '400':
+          description: Erro nos dados fornecidos
+    get:
+      tags:
+        - orders
+      summary: Lista todos os pedidos de locação
+      responses:
+        '200':
+          description: Lista de pedidos retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+  /orders/{id}:
+    get:
+      tags:
+        - orders
+      summary: Busca um pedido de locação por ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '200':
+          description: Pedido encontrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Pedido não encontrado
+    patch:
+      tags:
+        - orders
+      summary: Atualização de um pedido de locação
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statusRequest:
+                  type: string
+                  description: Novo status do pedido
+      responses:
+        '200':
+          description: Pedido atualizado com sucesso
+        '400':
+          description: Erro nos dados fornecidos
+    delete:
+      tags:
+        - orders
+      summary: Cancela um pedido de locação
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '200':
+          description: Pedido cancelado com sucesso
+        '400':
+          description: Erro ao cancelar o pedido
 components:
   securitySchemes:
     bearerAuth:
@@ -952,3 +1035,28 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Customer'
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        cpf_cliente:
+          type: string
+          description: CPF do cliente
+        plate:
+          type: string
+          description: Placa do carro
+        statusRequest:
+          type: string
+        dateRequest:
+          type: string
+          format: date-time
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+security:
+  - bearerAuth: []
