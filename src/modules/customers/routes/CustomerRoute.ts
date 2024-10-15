@@ -11,7 +11,7 @@ const updateCustomersService = new UpdateCustomerService();
 const deleteCustomersService = new DeleteCustomerService();
 
 customerRouter.post(
-  '/create',
+  '/',
   createCustomersService.validateCustomer,
   customerController.create,
 );
@@ -21,13 +21,13 @@ customerRouter.get('/:id', customerController.readById);
 customerRouter.get('/', customerController.read);
 
 customerRouter.patch(
-  '/update/:id',
+  '/:id',
   updateCustomersService.validateCustomerUpdate,
   customerController.update,
 );
 
 customerRouter.delete(
-  '/delete/:id',
+  '/:id',
   deleteCustomersService.validateCustomerDelete,
   customerController.delete,
 );

@@ -12,10 +12,10 @@ const carsController = new CarsController(
   new CarsService.DeleteCarService(),
 );
 
-carRoutes.post('/create', carsController.create);
-carRoutes.get('/', carsController.list);
+carRoutes.post('/', carsController.create);
 carRoutes.get('/:id', carsController.getById.bind(carsController));
-carRoutes.patch('/update/:id', carsController.updateCar);
-carRoutes.delete('/delete/:id', carsController.deleteCar);
+carRoutes.get('/', carsController.list);
+carRoutes.patch('/:id', carsController.updateCar);
+carRoutes.delete('/:id', carsController.deleteCar);
 
 export default carRoutes;
