@@ -4,6 +4,7 @@ import { validate as isUuid } from 'uuid';
 import { customerRepositorySource } from '../repositories/CustomerRepository';
 import IPagination from '../interface/IPagination';
 import ReadCustomerService from '../services/ReadCustomerService';
+import AppError from '../../../shared/errors/AppError';
 
 class CustomerController {
   async create(req: Request, res: Response): Promise<void> {
@@ -69,18 +70,15 @@ class CustomerController {
     await customerRepositorySource.softDelete({ id });
 
     if (!id || !isUuid(id)) {
-      res.status(400).json({ message: 'Valid ID is required' });
-      return;
+      throw new AppError('Valid ID is required', 400);
     }
 
     if (!customer) {
-      res.status(404).json({ message: 'Customer not found' });
-      return;
+      throw new AppError('Customer not found', 400);
     }
 
     if (customer.deletedAt) {
-      res.status(400).json({ message: 'Customer already deleted' });
-      return;
+      throw new AppError('Customer already deleted', 400);
     }
 
     res.status(200).json({ message: 'Customer deleted' });
@@ -96,14 +94,17 @@ class CustomerController {
         where: { id },
       });
       if (!existsCustomer) {
-        res.status(404).json({ message: 'Customer not found' });
-        return;
+        throw new AppError('Customer not found', 404);
       }
       await customerRepositorySource.update({ id }, customerData);
       res.status(200).json({ message: 'Customer updated' });
       return;
     } catch (error) {
-      res.status(500).json({ message: 'Internal Server Error', error });
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: 'Internal Server Error' });
     }
   }
 }
