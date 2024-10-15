@@ -14,6 +14,8 @@ servers:
 tags:
   - name: users
     description: Gerenciamento das informações sobre usuários do sistema
+  - name: login
+    description: Permite que usuários se autentiquem para ter acesso a API
   - name: clients
     description: Gerenciamento de clientes
   - name: cars
@@ -26,6 +28,8 @@ paths:
       tags:
         - users
       description: Criação de um novo usuário
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -56,9 +60,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
-                    example: "User created successfully."
                   userId:
                     type: string
                     format: uuid
@@ -72,7 +73,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "There is already a user registered with this email."
+                    example: "a user with this email address already exists"
         '400':
           description: Informações ausentes ou inválidas.
           content:
@@ -82,7 +83,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Incorrect or missing data."          
+                    example: "field is required"
     get:
       tags:
         - users
@@ -136,7 +137,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "User not found."
+                    example: {}
         '400':
           description: Parâmetros inválidos.
           content:
@@ -146,8 +147,9 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Invalid parameters."
+                    example: "invalid parameters / field is required."
   /users/{id}:
+
     get:
       tags:
         - users
@@ -165,8 +167,10 @@ paths:
       responses:
         '200':
           description: Informações detalhadas do usuário.
-          schema:
-          $ref: '#/components/schemas/User'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '404':
           description: Usuário não encontrado.
           content:
@@ -176,7 +180,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "User not found."
+                    example: "user not found"
         '400':
           description: ID inválido.
           content:
@@ -186,8 +190,8 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Invalid ID."
-    put:
+                    example: "invalid id"
+    patch:
       tags:
         - users
       description: Atualizar informações de um usuário
@@ -221,9 +225,11 @@ paths:
                   description: Senha do usuário (criptografada)
       responses:
         '200':
-          description: Informações detalhadas do usuário atualizadas.
-          schema:
-          $ref: '#/components/schemas/User'
+          description: Informações do usuário atualizadas com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '404':
           description: Usuário não encontrado.
           content:
@@ -233,7 +239,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "User not found."
+                    example: "user not found"
         '400':
           description: ID inválido.
           content:
@@ -243,7 +249,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Invalid ID."
+                    example: "invalid id"
     delete:
       tags:
         - users
@@ -272,7 +278,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "User not found."
+                    example: "user not found"
         '400':
           description: Informações inválidas.
           content:
@@ -282,7 +288,476 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Invalid data."
+                    example: "invalid data"
+  /login:
+    post:
+      tags:
+        - login
+      description: Autenticação de usuário (login)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email do usuário
+                password:
+                  type: string
+                  format: password
+                  description: Senha do usuário
+      responses:
+        '200':
+          description: Login realizado com sucesso. Retorna o token de autenticação.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '400':
+          description: Dados inválidos ou ausentes.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "field is required / invalid field format"
+        '404':
+          description: Usuário não encontrado ou excluído.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "user not found"
+  /cars/create:
+    post:
+      tags:
+        - Cars
+      summary: Create a new car
+      requestBody:
+        description: Car object to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarCreate'
+      responses:
+        201:
+          description: Car created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Car'
+        400:
+          description: Validation error
+  /cars/:
+    get:
+      tags:
+        - Cars
+      summary: List all cars
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, deleted]
+          description: Filter by car status
+        - name: plateEnd
+          in: query
+          schema:
+            type: string
+          description: Filter by the last characters of the plate
+        - name: brand
+          in: query
+          schema:
+            type: string
+          description: Filter by brand
+        - name: model
+          in: query
+          schema:
+            type: string
+          description: Filter by model
+        - name: mileage
+          in: query
+          schema:
+            type: integer
+          description: Filter by mileage
+        - name: yearFrom
+          in: query
+          schema:
+            type: integer
+          description: Filter by minimum year
+        - name: yearTo
+          in: query
+          schema:
+            type: integer
+          description: Filter by maximum year
+        - name: dailyPriceMin
+          in: query
+          schema:
+            type: number
+          description: Filter by minimum daily price
+        - name: dailyPriceMax
+          in: query
+          schema:
+            type: number
+          description: Filter by maximum daily price
+        - name: items
+          in: query
+          schema:
+            type: string
+          description: Filter by items (comma-separated values)
+      responses:
+        200:
+          description: A list of cars
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  currentPage:
+                    type: integer
+                  cars:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Car'
+        400:
+          description: Validation error
+  /cars/{id}:
+    get:
+      tags:
+        - Cars
+      summary: Get car by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Car found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Car'
+        404:
+          description: Car not found
+  /cars/update/{id}:
+    patch:
+      tags:
+        - Cars
+      summary: Update car details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Car object with updated data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarUpdate'
+      responses:
+        200:
+          description: Car updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Car'
+        400:
+          description: Validation error
+        404:
+          description: Car not found
+  /cars/delete/{id}:
+    delete:
+      tags:
+        - Cars
+      summary: Delete car by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Car deleted successfully
+        404:
+          description: Car not found
+        500:
+          description: Internal server error
+    /customers:
+      post:
+        tags:
+          - customers
+        description: Criação de um novo cliente.
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fullName:
+                    type: string
+                    description: Nome completo do cliente
+                    example: "João da Silva"
+                  email:
+                    type: string
+                    format: email
+                    description: Email do cliente
+                    example: "joao.silva@example.com"
+                  birthDate:
+                    type: string
+                    format: date
+                    description: Data de nascimento do cliente
+                    example: "1990-01-01"
+                  cpf:
+                    type: string
+                    description: CPF do cliente
+                    example: "123.456.789-00"
+                  phone:
+                    type: string
+                    description: Telefone do cliente
+                    example: "(11) 98765-4321"
+    responses:
+        '201':
+          description: Cliente criado com sucesso, retorna o cliente criado.
+          content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  example: "426de8fc-6c54-4c99-ab3a-2fe6001c9ba6"
+          '400':
+            description: Informações inválidas.
+            content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Name must be letters and must be more than 3 letters"
+          '500':
+            description: Erro interno.
+            content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal Server Error"
+get:
+  tags:
+    - customers
+  description: Listagem de clientes com filtros e paginação.
+  security:
+  - bearerAuth: []
+parameters:
+  - name: fullName
+    in: query
+    description: Filtrar por parte do nome do cliente.
+    schema:
+    type: string
+  - name: email
+    in: query
+    description: Filtrar por parte do e-mail.
+    schema:
+    type: string
+  - name: cpf
+    in: query
+    description: Filtrar por parte do CPF do cliente.
+    schema:
+      type: string
+  - name: exclude
+    in: query
+    description: Filtrar por status de exclusão (sim/não).
+    schema:
+      type: boolean
+  - name: order
+    in: query
+    description: Campo de ordenação (nome, data de cadastro, data de exclusão).
+    schema:
+      type: string
+  - name: page
+    in: query
+    description: Página atual da lista.
+    schema:
+      type: integer
+  - name: pageSize
+    in: query
+    description: Tamanho da página.
+    schema:
+      type: integer
+responses:
+      '200':
+        description: Lista de clientes retornada com sucesso.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerList'
+      '204':
+        description: Nenhum cliente encontrado.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "No customers found"
+      '400':
+        description: Parâmetros inválidos.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Invalid parameters."
+patch: 
+  tags:
+    - customers
+  description: Atualizar informações de um cliente
+  security:
+    - bearerAuth: []
+  parameters:
+      - name: id
+        in: path
+        description: ID do cliente
+        required: true
+        schema:
+          type: string
+          format: uuid
+  requestBody:
+    required: true
+    content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          fullName:
+            type: string
+            description: Nome completo do cliente
+          email:
+            type: string
+            format: email
+            description: Email do cliente
+          birthDate:
+            type: string
+            format: date
+            description: Data de nascimento do cliente
+          cpf:
+            type: string
+            description: CPF do cliente
+          phone:
+            type: string
+            description: Telefone do cliente
+    responses:
+      '200':
+        description: Informações de um cliente
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Customer updated"
+        '400':
+          description:  Informações inválidas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Send a valid CPF"            
+        '404':
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Customer not found"
+        '500':
+          description: Erro interno
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal Server Error"              
+      delete:
+          tags:
+            - customers
+          description: Soft delete de um cliente (marcar como excluído)
+          security:
+            - bearerAuth: []
+          parameters:
+            - name: id
+              in: path
+              description: ID do cliente
+              required: true
+              schema:
+                type: string
+                format: uuid
+      responses:
+        '204':
+          description: Cliente deletado com sucesso.
+          content:
+          {}
+        '404':
+        description: Cliente não encontrado.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Customer not found"
+        '400':
+          description: Informações inválidas.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Valid ID is required"  
 components:
   schemas:
     User:
@@ -324,3 +799,156 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
+    Car:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        plate:
+          type: string
+          example: ABC1234
+        brand:
+          type: string
+          example: Toyota
+        model:
+          type: string
+          example: Corolla
+        mileage:
+          type: integer
+          example: 50000
+        year:
+          type: integer
+          example: 2020
+        items:
+          type: array
+          items:
+            type: string
+          example: ["Air conditioning", "Leather seats"]
+        daily_price:
+          type: number
+          format: float
+          example: 99.99
+        status:
+          type: string
+          enum: [active, inactive, deleted]
+        registration_date:
+          type: string
+          format: date-time
+        updated_time:
+          type: string
+          format: date-time
+    CarCreate:
+      type: object
+      required:
+        - plate
+        - brand
+        - model
+        - year
+        - items
+        - daily_price
+        - status
+      properties:
+        plate:
+          type: string
+          example: ABC1234
+        brand:
+          type: string
+          example: Toyota
+        model:
+          type: string
+          example: Corolla
+        mileage:
+          type: integer
+          example: 50000
+        year:
+          type: integer
+          example: 2020
+        items:
+          type: array
+          items:
+            type: string
+          example: ["Air conditioning", "Leather seats"]
+        daily_price:
+          type: number
+          format: float
+          example: 99.99
+        status:
+          type: string
+          enum: [active, inactive]
+    CarUpdate:
+      type: object
+      properties:
+        plate:
+          type: string
+          example: ABC1234
+        brand:
+          type: string
+          example: Toyota
+        model:
+          type: string
+          example: Corolla
+        mileage:
+          type: integer
+          example: 50000
+        year:
+          type: integer
+          example: 2020
+        items:
+          type: array
+          items:
+            type: string
+          example: ["Air conditioning", "Leather seats"]
+        daily_price:
+          type: number
+          format: float
+          example: 99.99
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "426de8fc-6c54-4c99-ab3a-2fe6001c9ba6"
+        fullName:
+          type: string
+          example: "João da Silva"
+        email:
+          type: string
+          format: email
+          example: "joao.silva@example.com"
+        birthDate:
+          type: string
+          format: date
+          example: "1990-01-01"
+        cpf:
+          type: string
+          example: "123.456.789-00"
+        phone:
+          type: string
+          example: "(11) 98765-4321"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-10-01T12:00:00Z"
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+    CustomerList:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 2
+        totalPages:
+          type: integer
+          example: 1
+        currentPage:
+          type: integer
+          example: 1
+        customers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
