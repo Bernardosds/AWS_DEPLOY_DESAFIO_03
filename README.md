@@ -25,8 +25,48 @@ cd CarRentalAPI
 ```bash
 npm install
 ```
+
+## Criação do Banco de Dados com Migrations
+
+Este projeto utiliza o TypeORM para gerenciar o banco de dados, e as migrations são usadas para aplicar alterações na estrutura do banco. Siga os passos abaixo para criar e atualizar o banco de dados utilizando migratios.
+
+### Pré-requisitos
+
+- Certifique-se de que você tem o [Node.js](https://nodejs.org/) instalado.
+- O [MySQL](https://www.mysql.com/) ou outro banco de dados compatível com o TypeORM deve estar instalado e em execução.
+- As dependências do projeto devem estar instaladas.
+
+### Configuração do banco de dados
+Crie um arquivo `.env` na raíz do projeto e adicione as configurações do banco do seu banco de dados.
+um exemplo de configuração é: 
+
+```bash
+DB_HOST=localhost
+DB_PORT=3333
+DB_USERNAME=seu_usuario
+DB_PASSWORD=sua_senha
+DB_NAME=nome_do_banco
+```
+
+### Utilizando as migrations
+Primeiro gere a migration utilizando o comando:
+```bash
+npm run migration:generate
+```
+Após ser gerado o arquivo de migrations, execute ele utilizando o comando:
+```
+npm run migration:run
+```
+
+## Executando a aplicação
+Após ter clonado o repositório, instalado as dependencias, configurado o banco de dados e executado as migraitons. Inicie a API utilizando o comando:
+```
+npm start
+```
+
 ## Estrutura da Documentação para cada Endpoint
 
+## Endpoint de Users
 ### POST users
 **Descrição**: Criação de um novo usuário.
 
@@ -104,7 +144,7 @@ GET users?name=John&email=john.doe@example.com&excluded=false&sort=name&page=1&p
   "password": "string (senha)"
 }
 ```
-## Endpoints de Carros
+## Endpoint de Carros
 
 ### POST /cars/create
 **Descrição**: Cria um novo carro.
@@ -194,7 +234,7 @@ Parâmetro de Caminho:
 
 `id` (string, obrigatório): ID do carro.
 
-## Endpoints de Clientes
+## Endpoint de Clientes
 
 ### POST /customers/create
 
@@ -292,7 +332,7 @@ Parâmetro de Caminho:
 
 `id` (string, obrigatório): ID do cliente.
 
-## Endpoints de Pedidos
+## Endpoint de Pedidos
 ### POST /orders/create
  
 **Descrição**: Criação de um novo pedido de locação.
@@ -379,14 +419,16 @@ GET /users
 
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
- 
-Middleware de Autenticação
-Um middleware valida o token e adiciona o usuário à request (req.user), contendo o e-mail do usuário autenticado.
-Respostas Comuns
-401 Unauthorized: Token ausente, inválido ou expirado.
-403 Forbidden: Acesso negado ao recurso solicitado.
 ```
+**Middleware de Autenticação**:
+Um middleware valida o token e adiciona o usuário à request (req.user), contendo o e-mail do usuário autenticado.
 
-Trello: https://trello.com/b/09SpYG44/squad-coringa
 
-Notion: https://www.notion.so/AWS_NODE_AGO24_DESAFIO_02_CORINGA-1189cc978ad280b58f9ec2763907bf52
+# SCRUM
+**Documentação das Dailies**: <br>
+
+**Notion**: https://fluttering-starflower-2cd.notion.site/AWS_NODE_AGO24_DESAFIO_02_CORINGA-1189cc978ad280b58f9ec2763907bf52
+
+**Organização de tasks**: Para vizualizar os dados do Trello, solicite acesso através do link:<br>
+
+**Trello**: https://trello.com/b/09SpYG44/squad-coringa
