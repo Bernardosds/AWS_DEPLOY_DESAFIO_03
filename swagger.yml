@@ -354,7 +354,7 @@ paths:
                   type: string
                   format: date
                   description: Data de nascimento do cliente
-                  example: '1990-01-01'
+                  example: '01-12-1990'
                 cpf:
                   type: string
                   description: CPF do cliente
