@@ -174,7 +174,7 @@ pm2 save
 
 ## Como utilizar a API
 - No postman ou outro app de sua preferência substitua o localhost por: 3.144.187.153
-- Exemplo http:/3.144.187.153:3000/login
+- Exemplo POST http:/3.144.187.153:3000/login
 ```json
   {
   "email": "user@example.com",
