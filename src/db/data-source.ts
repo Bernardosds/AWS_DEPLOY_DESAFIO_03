@@ -21,7 +21,7 @@ const AppDataSource = new DataSource({
   synchronize: false,
   logging: false,
   entities: [Customer, User, Order, Cars],
-  migrations: ['src/db/migration/*.ts'],
+  migrations: ['src/db/migration/*.js'],
   subscribers: [],
 });
 

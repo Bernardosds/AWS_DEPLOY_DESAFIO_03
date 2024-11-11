@@ -49,9 +49,9 @@ const listCarValidator = Joi.object({
     'number.base': 'Page number must be a number',
     'number.min': 'Page number must be at least 1',
   }),
-  size: Joi.number().min(1).messages({
-    'number.base': 'Size must be a number',
-    'number.min': 'Size must be at least 1',
+  limit: Joi.number().min(1).messages({
+    'number.base': 'limit must be a number',
+    'number.min': 'limit must be at least 1',
   }),
 });
 
