@@ -175,9 +175,18 @@ pm2 save
 ## Como utilizar a API
 - No postman ou outro app de sua preferência substitua o localhost por: 3.144.187.153
 - Exemplo http:/3.144.187.153:3000/login
-  ```json
+```json
   {
   "email": "user@example.com",
   "password": "your_password"
   }
 ```
+# Como fazer um Bucket S3 na AWS
+- No menu superior esquerdo clique em **Services**, role até em baixo clique em **Storage** e por fim selecione **S3**
+- No menu do S3 clique no botão Laranja **Create Bucket**
+- De um nome para seu bucket, e configure ele de acordo com sua necessidade.
+- Por fim clique no botão laranja **Create Bucket** novamente.
+## Subindo arquivos
+- Com o bucket já criado, clique no bucket que deseja usar.
+- Clique no botão laranja **upload** a direita da página e envie seu arquivo ou pasta.
+
